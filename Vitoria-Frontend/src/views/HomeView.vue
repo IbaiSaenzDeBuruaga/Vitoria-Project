@@ -83,6 +83,7 @@
         </button>
       </div>
     </div>
+    <Footer />
   </div>
 </template>
 
@@ -92,6 +93,7 @@ import { UserCircle2Icon, SearchIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
 import LoginOptions from '../components/LoginOptions.vue'
 import LoginTMC from '../components/LoginTMC.vue'
+import Footer from '../components/Footer.vue'
 
 const activities = ref([
   {
