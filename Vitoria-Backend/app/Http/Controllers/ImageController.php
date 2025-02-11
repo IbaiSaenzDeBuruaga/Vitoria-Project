@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -46,6 +47,22 @@ class ImageController extends Controller
         
         return true;
 
+    }
+
+    public static function cargarImagenActividad(Request $request, Activity $actividad){
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if (!$request->file('image')->isValid()) {
+            return response()->json(['error' => 'Error al subir la imagen'], 400);
+        }
+
+        $image = $request->file('image');
+        $path = $image->store('images', 'public');
+        $actividad->imagen = $path;
+        
+        return true;
     }
 
 
