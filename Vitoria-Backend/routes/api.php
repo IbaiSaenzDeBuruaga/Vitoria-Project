@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\CentroCivicoController;
 
 
 
@@ -15,8 +16,9 @@ Route::prefix('main')->group(function () {
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
     Route::middleware('auth:api')->group(function () {
-        Route::post('register', [AuthController::class, 'register'])->middleware('admin');
+        //Route::post('register', [AuthController::class, 'register'])->middleware('admin');
         Route::post('register_tecnico', [AuthController::class, 'registerTecnico'])->middleware('admin');
         Route::get('me', [AuthController::class, 'me']);
         Route::get('me_data', [AuthController::class, 'meData']);
