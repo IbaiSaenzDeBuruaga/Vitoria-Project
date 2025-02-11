@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         // Check if the user is enabled
         if ($user->habilitado !== 1) {
-            auth()->logout(); // Logout user if disabled
+            auth()->logout(); // Logout user if disable
             return response()->json(['error' => 'Este usuario está deshabilitado y no puede iniciar sesión.'], Response::HTTP_FORBIDDEN);
         }
 
@@ -52,6 +52,7 @@ class AuthController extends Controller
         return redirect(route('login'));
     }
 
+    
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -105,13 +106,12 @@ class AuthController extends Controller
     }
 
 
-    public function registerTecnico(Request $request)
+    public function registerAdmin(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
             'email' => ['required', 'email', 'unique:users,email'],  
-            'id_campus' => ['required', 'integer', 'exists:campuses,id'], // Agregamos la validación para id_campus
             'primer_apellido' => ['nullable', 'string'],
             'segundo_apellido' => ['nullable', 'string'],
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -124,10 +124,7 @@ class AuthController extends Controller
             'email.unique' => 'El correo ya está registrado.',
             'email.email' => 'El correo no tiene el formato correcto.',
             'password.required' => 'El campo contraseña es obligatorio.',
-            'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.',
-            'id_campus.required' => 'El campo campus es obligatorio.',
-            'id_campus.integer' => 'El campo campus debe ser un número entero.',
-            'id_campus.exists' => 'El campus seleccionado no es válido.',
+            'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.'
         ]);
 
         if ($validator->fails()) {
@@ -137,15 +134,13 @@ class AuthController extends Controller
         $exists = User::where('email', htmlspecialchars($request->input('email')))->first();
         if (!$exists) {
 
-            $  $new = new User();
+            $new = new User();
             $new->name = $request->get('name');
             $request->get('primer_apellido') ? $new->primer_apellido = $request->get('primer_apellido') : $new->primer_apellido = "" ;
             $request->get('segundo_apellido') ? $new->segundo_apellido = $request->get('segundo_apellido') : $new->segundo_apellido = "" ;
             $new->email = $request->get('email');
             $new->password = Hash::make($request->get('password'));
-            $new->rol = 'operario';
-            $new->habilitado = 1;
-            $new->id_campus = $request->get('id_campus');
+            $new->rol = 'administrador';
     
             if($request->file('image') != null){
                 ImageController::cargarImagen($request,$new);

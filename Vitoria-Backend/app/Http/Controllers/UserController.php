@@ -27,60 +27,6 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255', 'min:2'],
-            'primer_apellido' => ['required', 'string', 'max:255'],
-            'segundo_apellido' => ['nullable', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
-            'rol' => ['required', 'in:operario,tecnico,administrador'],
-            'foto_perfil' => ['nullable', 'string'], // You might want to add validation for file types etc.
-            'habilitado' => ['nullable', 'boolean'],
-        ], [
-            'name.required' => 'El campo nombre es obligatorio.',
-            'name.min' => 'El nombre debe tener al menos :min caracteres.',
-            'name.max' => 'El nombre no puede tener más de :max caracteres.',
-            'primer_apellido.required' => 'El campo primer apellido es obligatorio.',
-            'segundo_apellido.max' => 'El segundo apellido no puede tener más de :max caracteres.',
-            'email.required' => 'El campo correo es obligatorio.',
-            'email.unique' => 'El correo ya está registrado.',
-            'email.email' => 'El correo no tiene el formato correcto.',
-            'password.required' => 'El campo contraseña es obligatorio.',
-            'password.min' => 'El campo contraseña debe tener un mínimo de :min caracteres.',
-            'rol.required' => 'El campo rol es obligatorio.',
-            'rol.in' => 'El rol seleccionado no es válido.',
-            'foto_perfil.string' => 'La foto de perfil debe ser una cadena de texto.',
-            'habilitado.boolean' => 'El campo habilitado debe ser booleano.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
-        }
-
-        $validatedData = [
-            'name' => strip_tags($request->input('name')),
-            'primer_apellido' => strip_tags($request->input('primer_apellido')),
-            'segundo_apellido' => strip_tags($request->input('segundo_apellido')),
-            'email' => strip_tags($request->input('email')),
-            'password' => Hash::make($request->input('password')),
-            'rol' => $request->input('rol'),
-            'foto_perfil' => $request->input('foto_perfil'),
-            'habilitado' => $request->input('habilitado', true), // Default to true if not provided
-        ];
-
-        $newUser = User::create($validatedData);
-
-        if (!$newUser) {
-            return response()->json(['error' => 'No se logró crear el usuario'], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return response()->json($newUser, Response::HTTP_CREATED);
-    }
 
     /**
      * Display the specified resource.
