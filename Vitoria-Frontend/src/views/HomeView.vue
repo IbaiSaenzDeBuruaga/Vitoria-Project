@@ -91,56 +91,56 @@ import ActivityCard from '../components/ActivityCard.vue'
 const activities = ref([
   {
     title: "Yoga",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://xuanlanyoga.com/wp-content/uploads/2020/04/tipos-de-yoga-diferentes-1200x800.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Club de Lectura",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://eventoociomadrid.com/wp-content/uploads/2022/09/Como-organizar-un-club-de-lectura.png",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Futbol",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://img2.rtve.es/v/16180406?w=1600&preview=01720553441800.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Balonmano",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://s3.sportstatics.com/relevo/www/multimedia/202501/22/media/cortadas/imanol-garciandia-REZFul2HYH4ot4zFncMmgVN-1200x648@Relevo.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Natación",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://blog.uclm.es/ricardofdez/wp-content/uploads/sites/10/2010/12/image0012-300x1831-1.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Pilates",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://imagenes.20minutos.es/files/image_990_556/files/fp/uploads/imagenes/2024/09/14/la-postura-side-twist-trabaja-fundamentalmente-la-musculatura-del-core.r_d.1191-770.jpeg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Tenis",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://tennis-hack.com/wp-content/uploads/mejores-zapatillas-tenis-600x354.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Baloncesto",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://media.revistagq.com/photos/61728fcbe858877e3db8331b/3:2/w_3852,h_2568,c_limit/GettyImages-1347986068.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
@@ -201,10 +201,12 @@ header {
 .filters {
   background-color: #006758;
   padding: 0.5rem 1rem;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
 .filters-content {
-  max-width: 72rem;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
@@ -245,7 +247,7 @@ main {
 }
 
 .activities-grid {
-  max-width: 72rem;
+  max-width: auto;
   margin: 0 auto;
   display: grid;
   gap: 1.5rem;
