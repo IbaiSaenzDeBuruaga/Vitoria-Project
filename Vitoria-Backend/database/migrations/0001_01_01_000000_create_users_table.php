@@ -20,6 +20,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('foto_perfil')->nullable();
+            $table->enum('rol', ['admin', 'usuario'])->default('usuario');
             $table->rememberToken();
             $table->timestamps();
         });
