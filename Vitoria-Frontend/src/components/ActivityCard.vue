@@ -41,16 +41,19 @@ defineProps({
   border-radius: 0.5rem;
   background-color: #006758;
   padding: 1rem;
+  border-radius: 25px;
 }
 
 .activity-content {
   display: flex;
+  align-content: space-between;
+  
 }
 
 .activity-image {
   position: relative;
-  height: 140px;
-  width: 200px;
+  height: 190px;
+  width: 300px;
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 0.5rem;

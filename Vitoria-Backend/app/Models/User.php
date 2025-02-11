@@ -73,14 +73,8 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
         return [];
     }
 
-
-    public function incindencias(){
-        return $this->hasMany(Incidencia::class, 'id_usuario_reporta', 'id_usuario');
+    public function actividades(){
+        return $this->belongsToMany(Activity::class);
     }
-
-    public function campuses(){
-        return $this->belongsTo(Campus::class, 'id_campus','id_campus');
-    }
-
 
 }

@@ -12,4 +12,9 @@ class Activity extends Model
         'nombre',
         'imagen'
     ];
+
+    public function CentroCivicos(){
+        return $this->belongsTo(CentroCivico::class);
+    }
+
 }

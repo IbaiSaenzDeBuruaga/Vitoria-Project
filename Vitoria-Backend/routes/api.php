@@ -8,6 +8,7 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\ImageController;
 
 
+
 Route::prefix('main')->group(function () {
     Route::get('carga-inicial', [MainController::class, 'cargaInicial']);
 });     
@@ -55,6 +56,19 @@ Route::prefix('usuario')->group(function () {
         Route::put('disable/{usuario}',[UserController::class, 'disable'])->middleware('admin');
         Route::delete('delete/{usuario}',[UserController::class,'destroy'])->middleware('admin');
         Route::put('reset_password',[UserController::class,'resetPassword']);
+
+    
+
+    });
+
+    Route::prefix('centros-civicos')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::get('/', [CentroCivicoController::class, 'index']);
+            Route::post('/', [CentroCivicoController::class, 'store'])->middleware('admin'); //Solo admins pueden crear
+            Route::get('/{centroCivico}', [CentroCivicoController::class, 'show']);
+            Route::put('/{centroCivico}', [CentroCivicoController::class, 'update'])->middleware('admin'); //Solo admins pueden actualizar
+            Route::delete('/{centroCivico}', [CentroCivicoController::class, 'destroy'])->middleware('admin'); //Solo admins pueden eliminar
+        });
     });
 });
 

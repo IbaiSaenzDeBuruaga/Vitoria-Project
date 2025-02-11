@@ -3,17 +3,18 @@
     <!-- Header -->
     <header>
       <div class="header-content">
-        <div class="logo-container">
+        <div class="logo-container" @click="resetToHome">
           <img
             src="../assets/images/logo.png"
             alt="Vitoria Gasteiz"
             class="logo"
+            style="cursor: pointer;"
           />
           <div class="logo-text">
             <span class="bold">sede</span> <span>electrónica</span>
           </div>
         </div>
-        <button class="connect-button">
+        <button class="connect-button" @click="showLoginOptions" v-if="!isLoggedIn">
           <user-circle-2-icon />
           Conectar
         </button>
@@ -21,7 +22,7 @@
     </header>
 
     <!-- Filters -->
-    <div class="filters">
+    <div class="filters" v-if="!showLogin && !showTMC && !isLoggedIn">
       <div class="filters-content">
         <div class="filter-item">
           <label>Centro cívico</label>
@@ -57,9 +58,11 @@
       </div>
     </div>
 
-    <!-- Activities Grid -->
+    <!-- Activities Grid / Login Options -->
     <main>
-      <div class="activities-grid">
+      <LoginOptions v-if="showLogin && !isLoggedIn" @tmc-selected="showTMCLogin" />
+      <LoginTMC v-else-if="showTMC && !isLoggedIn" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess"/>
+      <div v-else class="activities-grid">
         <activity-card
           v-for="activity in activities"
           :key="activity.title"
@@ -69,7 +72,7 @@
     </main>
 
     <!-- Pagination -->
-    <div class="pagination">
+    <div class="pagination" v-if="!showLogin && !showTMC && !isLoggedIn">
       <div class="pagination-content">
         <button
           v-for="page in 5"
@@ -87,66 +90,94 @@
 import { ref } from 'vue'
 import { UserCircle2Icon, SearchIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
+import LoginOptions from '../components/LoginOptions.vue'
+import LoginTMC from '../components/LoginTMC.vue'
 
 const activities = ref([
   {
     title: "Yoga",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://xuanlanyoga.com/wp-content/uploads/2020/04/tipos-de-yoga-diferentes-1200x800.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Club de Lectura",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://eventoociomadrid.com/wp-content/uploads/2022/09/Como-organizar-un-club-de-lectura.png",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Futbol",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://img2.rtve.es/v/16180406?w=1600&preview=01720553441800.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Balonmano",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://s3.sportstatics.com/relevo/www/multimedia/202501/22/media/cortadas/imanol-garciandia-REZFul2HYH4ot4zFncMmgVN-1200x648@Relevo.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Natación",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://blog.uclm.es/ricardofdez/wp-content/uploads/sites/10/2010/12/image0012-300x1831-1.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Pilates",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://imagenes.20minutos.es/files/image_990_556/files/fp/uploads/imagenes/2024/09/14/la-postura-side-twist-trabaja-fundamentalmente-la-musculatura-del-core.r_d.1191-770.jpeg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Tenis",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://tennis-hack.com/wp-content/uploads/mejores-zapatillas-tenis-600x354.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
   },
   {
     title: "Baloncesto",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "https://media.revistagq.com/photos/61728fcbe858877e3db8331b/3:2/w_3852,h_2568,c_limit/GettyImages-1347986068.jpg",
     dates: "29/06/2023 - 29/07/2025",
     schedule: "11:00-11:30",
     days: "Martes y Jueves"
-  }
-  
+  },
+
 ])
+
+const showLogin = ref(false)
+const showTMC = ref(false)
+const isLoggedIn = ref(false)
+
+const showLoginOptions = () => {
+  showLogin.value = true
+  showTMC.value = false
+}
+
+const showTMCLogin = () => {
+  showLogin.value = false
+  showTMC.value = true
+}
+
+const resetToHome = () => {
+  showLogin.value = false
+  showTMC.value = false
+  isLoggedIn.value = false
+}
+
+const handleLoginSuccess = () => {
+    showLogin.value = false
+    showTMC.value = false
+    isLoggedIn.value = true
+}
 </script>
 
 <style scoped>
@@ -201,10 +232,12 @@ header {
 .filters {
   background-color: #006758;
   padding: 0.5rem 1rem;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
 .filters-content {
-  max-width: 72rem;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
@@ -245,7 +278,7 @@ main {
 }
 
 .activities-grid {
-  max-width: 72rem;
+  max-width: auto;
   margin: 0 auto;
   display: grid;
   gap: 1.5rem;
