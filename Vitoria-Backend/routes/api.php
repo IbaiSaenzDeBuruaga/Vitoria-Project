@@ -1,19 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CampusController;
-use App\Http\Controllers\MaquinaController;
-use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TipoIncidenciaController;
-use App\Http\Controllers\IncidenciaController;
-use App\Http\Controllers\TecnicoIncidenciaController;
-use App\Http\Controllers\MainController;
-use App\Http\Controllers\MantenimientoPreventivoController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\MantenimientoMaquinaController;
-use App\Models\MantenimientoMaquina;
+
 
 Route::prefix('v1')->group(function () {
 
@@ -57,6 +47,18 @@ Route::prefix('v1')->group(function () {
           Route::delete('delete/{usuario}',[UserController::class,'destroy'])->middleware('admin');
           Route::put('reset_password',[UserController::class,'resetPassword']);
         });
+
+    });
+
+    Route::prefix('centros-civicos')->group(function () {
+        Route::middleware('auth:api')->group(function () {
+            Route::get('/', [CentroCivicoController::class, 'index']);
+            Route::post('/', [CentroCivicoController::class, 'store'])->middleware('admin'); //Solo admins pueden crear
+            Route::get('/{centroCivico}', [CentroCivicoController::class, 'show']);
+            Route::put('/{centroCivico}', [CentroCivicoController::class, 'update'])->middleware('admin'); //Solo admins pueden actualizar
+            Route::delete('/{centroCivico}', [CentroCivicoController::class, 'destroy'])->middleware('admin'); //Solo admins pueden eliminar
+        });
+
     });
 });
 
