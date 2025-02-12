@@ -15,4 +15,12 @@ class ActivityCentro extends Pivot
         'fecha' => 'date',
         'horario_inicio' => 'time',
     ];
+
+    public function activity(){
+        return $this->belongsTo(Activity::class,"activity_id", "id");
+    }
+
+    public function centroCivico(){
+        return $this->belongsTo(CentroCivico::class,"centro_id", "id");
+    }
 }
