@@ -62,10 +62,13 @@
     <main>
       <LoginOptions v-if="showLogin && !isLoggedIn" @tmc-selected="showTMCLogin" />
       <LoginTMC v-else-if="showTMC && !isLoggedIn" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess"/>
+
+      <div v-if="activityStore.loading">Cargando actividades...</div>
+      <div v-else-if="activityStore.error">Error: {{ activityStore.error }}</div>
       <div v-else class="activities-grid">
         <activity-card
-          v-for="activity in activities"
-          :key="activity.title"
+          v-for="activity in activityStore.activities"
+          :key="activity.id"
           v-bind="activity"
         />
       </div>
@@ -88,72 +91,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { UserCircle2Icon, SearchIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
 import LoginOptions from '../components/LoginOptions.vue'
 import LoginTMC from '../components/LoginTMC.vue'
 import Footer from '../components/Footer.vue'
+import { useActivityStore } from '../stores/store'; // Importa el store de Pinia
 
-const activities = ref([
-  {
-    title: "Yoga",
-    image: "https://xuanlanyoga.com/wp-content/uploads/2020/04/tipos-de-yoga-diferentes-1200x800.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Club de Lectura",
-    image: "https://eventoociomadrid.com/wp-content/uploads/2022/09/Como-organizar-un-club-de-lectura.png",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Futbol",
-    image: "https://img2.rtve.es/v/16180406?w=1600&preview=01720553441800.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Balonmano",
-    image: "https://s3.sportstatics.com/relevo/www/multimedia/202501/22/media/cortadas/imanol-garciandia-REZFul2HYH4ot4zFncMmgVN-1200x648@Relevo.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Natación",
-    image: "https://blog.uclm.es/ricardofdez/wp-content/uploads/sites/10/2010/12/image0012-300x1831-1.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Pilates",
-    image: "https://imagenes.20minutos.es/files/image_990_556/files/fp/uploads/imagenes/2024/09/14/la-postura-side-twist-trabaja-fundamentalmente-la-musculatura-del-core.r_d.1191-770.jpeg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Tenis",
-    image: "https://tennis-hack.com/wp-content/uploads/mejores-zapatillas-tenis-600x354.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-  {
-    title: "Baloncesto",
-    image: "https://media.revistagq.com/photos/61728fcbe858877e3db8331b/3:2/w_3852,h_2568,c_limit/GettyImages-1347986068.jpg",
-    dates: "29/06/2023 - 29/07/2025",
-    schedule: "11:00-11:30",
-    days: "Martes y Jueves"
-  },
-
-])
+const activityStore = useActivityStore(); // Usa el store
 
 const showLogin = ref(false)
 const showTMC = ref(false)
@@ -180,6 +126,10 @@ const handleLoginSuccess = () => {
     showTMC.value = false
     isLoggedIn.value = true
 }
+
+onMounted(() => {
+  activityStore.getActivities(); // Llama a la función para obtener las actividades al montar el componente
+});
 </script>
 
 <style scoped>

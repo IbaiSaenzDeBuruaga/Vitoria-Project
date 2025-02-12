@@ -97,7 +97,7 @@ class ActivityController extends Controller
         }
     }
 
-    public function addCentroCivicoToActivity(Request $request, Activity $activity, CentrogitCivico $centroCivico)
+    public function addCentroCivicoToActivity(Request $request, Activity $activity, CentroCivico $centroCivico)
 {
     $validator = Validator::make($request->all(), [
         'fecha' => 'required|date',
