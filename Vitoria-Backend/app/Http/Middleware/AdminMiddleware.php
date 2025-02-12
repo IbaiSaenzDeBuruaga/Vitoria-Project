@@ -17,10 +17,10 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            if (Auth::user()->rol == "administrador") { 
+            if (Auth::user()->rol == "admin") { 
                 return $next($request);
             } else {
-                return response()->json(['message' => 'Forbidden: No tienes permiso de técnico.'], 403);
+                return response()->json(['message' => 'Forbidden: No tienes permiso de Admin.'], 403);
             }
         } else {
             return response()->json(['message' => 'Unauthorized: No estas autenticado.'], 401);

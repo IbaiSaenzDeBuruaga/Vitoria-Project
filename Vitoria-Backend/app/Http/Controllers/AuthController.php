@@ -33,8 +33,11 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
+
+    
         $credentials = request(['email', 'password']);
-       
+    
+        
         if (! $token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Datos de acceso incorrectos. Por favor, verifica tus credenciales.'], Response::HTTP_UNAUTHORIZED);
         }
