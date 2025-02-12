@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Ramsey\Uuid\Type\Integer;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
+use function Termwind\parse;
 
 class AuthController extends Controller
 {
@@ -38,12 +41,6 @@ class AuthController extends Controller
 
         $user = auth()->user();
 
-        // Check if the user is enabled
-        if ($user->habilitado !== 1) {
-            auth()->logout(); // Logout user if disable
-            return response()->json(['error' => 'Este usuario está deshabilitado y no puede iniciar sesión.'], Response::HTTP_FORBIDDEN);
-        }
-
         return $this->respondWithToken($token);
     }
 
@@ -58,11 +55,9 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100', 'min:2'],
             'password' => ['required', 'string', 'min:8'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'id_campus' => ['required', 'integer', 'exists:campuses,id'], // Agregamos la validación para id_campus
+            'email' => ['required', 'email', 'unique:users,email'],// Agregamos la validación para id_campus
             'primer_apellido' => ['nullable', 'string'],
-            'segundo_apellido' => ['nullable', 'string'],
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'segundo_apellido' => ['nullable', 'string']
         ], [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.min' => 'El nombre debe tener al menos :min caracteres.',
@@ -71,10 +66,7 @@ class AuthController extends Controller
             'email.unique' => 'El correo ya está registrado.',
             'email.email' => 'El correo no tiene el formato correcto.',
             'password.required' => 'El campo contraseña es obligatorio.',
-            'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.',
-            'id_campus.required' => 'El campo campus es obligatorio.',
-            'id_campus.integer' => 'El campo campus debe ser un número entero.',
-            'id_campus.exists' => 'El campus seleccionado no es válido.',
+            'password.min' => 'El campo contraseña debe tener un minimo :min caracteres.'
         ]);
 
         if ($validator->fails()) {
@@ -90,13 +82,10 @@ class AuthController extends Controller
             $request->get('segundo_apellido') ? $new->segundo_apellido = $request->get('segundo_apellido') : $new->segundo_apellido = "" ;
             $new->email = $request->get('email');
             $new->password = Hash::make($request->get('password'));
-            $new->rol = 'operario';
-            $new->id_campus = $request->get('id_campus');
-            $new->habilitado = 1;
-    
-            if($request->file('image') != null){
-                ImageController::cargarImagen($request,$new);
-            }
+            $new->rol = 'usuario';
+            $new->n_tarjeta = $this->crearNumTarjeta();
+            $new->n_barcos = $this->crearNumTarjeta();
+        
             $new->save();
 
             return response()->json($new, Response::HTTP_CREATED);
@@ -255,4 +244,13 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60
         ], Response::HTTP_OK);
     }
+
+    protected function crearNumTarjeta() {
+        $numTarjeta = '';
+        for ($i = 0; $i < 16; $i++) {
+            $numTarjeta .= rand(0, 9);
+        }
+        return $numTarjeta;
+    }
+
 }
