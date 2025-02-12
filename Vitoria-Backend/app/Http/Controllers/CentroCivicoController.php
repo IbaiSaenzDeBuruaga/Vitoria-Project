@@ -90,7 +90,7 @@ class CentroCivicoController extends Controller
         try {
             // Authorization check
             $centroCivico->delete();
-            return response()->json(['message' => 'Centro civico deleted successfully'], Response::HTTP_NO_CONTENT);
+            return response()->json(['message' => 'Centro civico deleted successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete centro civico', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

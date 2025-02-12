@@ -98,27 +98,27 @@ class ActivityController extends Controller
     }
 
     public function addCentroCivicoToActivity(Request $request, Activity $activity, CentroCivico $centroCivico)
-{
-    $validator = Validator::make($request->all(), [
-        'fecha' => 'required|date',
-        'horario_inicio' => 'required|date_format:H:i',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
-
-    try {
-        $activity->centroCivicos()->attach($centroCivico, [
-            'fecha' => $request->fecha,
-            'horario_inicio' => $request->horario_inicio,
+    {
+        $validator = Validator::make($request->all(), [
+            'fecha' => 'required|date',
+            'horario_inicio' => 'required|date_format:H:i',
         ]);
 
-        return response()->json(['message' => 'Centro civico added to activity successfully'], Response::HTTP_OK);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Failed to add centro civico to activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        try {
+            $activity->centroCivicos()->attach($centroCivico, [
+                'fecha' => $request->fecha,
+                'horario_inicio' => $request->horario_inicio,
+            ]);
+            
+            return response()->json(['message' => 'Centro civico added to activity successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to add centro civico to activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-}
 
 public function removeCentroCivicoFromActivity(Activity $activity, CentroCivico $centroCivico)
 {

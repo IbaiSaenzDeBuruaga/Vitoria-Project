@@ -35,10 +35,14 @@ Route::prefix('image')->group(function () {
 });
 
 Route::prefix('activity')->group(function () {
-    Route::post('/',[ActivityController::class,'store']);
     Route::get('{activity}',[ActivityController::class, 'show']);
-    Route::put('{activity}/update' , [ActivityController::class,'update']);
-    Route::delete('{activity}/delete',[ActivityController::class,'destroy']);
+    Route::get('/all',[ActivityController::class, 'index']);
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/',[ActivityController::class,'store'])->middleware('admin');
+        Route::put('{activity}/update' , [ActivityController::class,'update'])->middleware('admin');
+        Route::delete('{activity}/delete',[ActivityController::class,'destroy'])->middleware('admin');
+        Route::put('{activity}/centro/{centroCivico}',[ActivityController::class,'addCentroCivicoToActivity'])->middleware('admin');
+    });
 });
 
 
@@ -52,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
 Route::prefix('usuario')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::get('all',[UserController::class, 'all']);
-        Route::get('{usuario}/show',[UserController::class, 'show'])->middleware('admin');
+        Route::get('{usuario}',[UserController::class, 'show'])->middleware('admin');
         Route::put('{usuario}/update',[UserController::class, 'update'])->middleware('admin');
         Route::delete('{usuario}/delete',[UserController::class,'destroy'])->middleware('admin');
         Route::put('reset_password',[UserController::class,'resetPassword']);
@@ -61,11 +65,11 @@ Route::prefix('usuario')->group(function () {
 
 Route::prefix('centros-civicos')->group(function () {
     Route::get('/all', [CentroCivicoController::class, 'index']);
-    Route::get('{centroCivico}/show', [CentroCivicoController::class, 'show']);
+    Route::get('{centroCivico}', [CentroCivicoController::class, 'show']);
     Route::middleware('auth:api')->group(function () {
         Route::post('/', [CentroCivicoController::class, 'store'])->middleware('admin'); //Solo admins pueden crear
         Route::put('{centroCivico}/update', [CentroCivicoController::class, 'update'])->middleware('admin'); //Solo admins pueden actualizar
-        Route::delete('{centroCivico}/delete', [CentroCivicoController::class, 'destroy'])->middleware('admin'); //Solo admins pueden eliminar
+        Route::delete('{centroCivico}', [CentroCivicoController::class, 'destroy'])->middleware('admin'); //Solo admins pueden eliminar
     });
 });
 
