@@ -13,7 +13,7 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function all()
     {
         try {
             // Authorization check
@@ -113,7 +113,7 @@ class ActivityController extends Controller
                 'fecha' => $request->fecha,
                 'horario_inicio' => $request->horario_inicio,
             ]);
-            
+
             return response()->json(['message' => 'Centro civico added to activity successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to add centro civico to activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
