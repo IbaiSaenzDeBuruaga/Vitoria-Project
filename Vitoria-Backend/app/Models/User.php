@@ -2,21 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject; // Import the JWTSubject interface
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Authenticatable implements JWTSubject // Implement the interface
+class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -24,16 +23,15 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
         'segundo_apellido',
         'email',
         'password',
+        'n_tarjeta',
+        'n_barcos',
         'rol',
-        'foto_perfil',
-        'habilitado',
-        'id_campus'
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -41,40 +39,32 @@ class User extends Authenticatable implements JWTSubject // Implement the interf
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
+     * The attributes that should be cast to native types.
      *
-     * @return mixed
+     * @var array
      */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
+    // protected $casts = [
+    //     'n_tarjeta' => 'integer',
+    //     'n_barcos' => 'integer',
+    // ];
 
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
+     /**
+     * Define the relationship with activities.
      *
-     * @return array
+     * @return BelongsToMany
      */
-    public function getJWTCustomClaims()
+    public function activities(): BelongsToMany
     {
-        return [];
-    }
-
-    public function actividades(){
         return $this->belongsToMany(Activity::class);
     }
-
 }
