@@ -24,48 +24,6 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'primer_apellido' => 'required|string|max:255',
-            'segundo_apellido' => 'nullable|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'n_tarjeta' => 'required|integer',
-            'n_barcos' => 'required|integer',
-            'rol' => 'nullable|in:admin,usuario', // Optional, with allowed values
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        try {
-            // Authorization check (e.g., can('create', User::class))
-            $user = User::create([
-                'name' => $request->name,
-                'primer_apellido' => $request->primer_apellido,
-                'segundo_apellido' => $request->segundo_apellido,
-                'email' => $request->email,
-                'password' => Hash::make($request->password), // Hash the password!
-                'n_tarjeta' => $request->n_tarjeta,
-                'n_barcos' => $request->n_barcos,
-                'rol' => $request->rol ?? 'usuario', // Default to 'usuario' if not provided
-            ]);
-
-            return response()->json(['data' => $user, 'message' => 'User created successfully'], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create user', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(User $user)
     {
         try {
