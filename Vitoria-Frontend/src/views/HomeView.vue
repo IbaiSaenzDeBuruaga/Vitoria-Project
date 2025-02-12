@@ -67,10 +67,14 @@
       <div v-else-if="activityStore.error">Error: {{ activityStore.error }}</div>
       <div v-else class="activities-grid">
         <activity-card
-          v-for="activity in activityStore.activities"
-          :key="activity.id"
-          v-bind="activity"
-        />
+      v-for="activity in activityStore.activities"
+      :key="activity.id"
+      :nombre="activity.nombre"
+      :imagen="activity.imagen"
+      :dates="activity.dates" 
+      :schedule="activity.schedule" 
+      :days="activity.days"    
+    />
       </div>
     </main>
 

@@ -9,7 +9,7 @@
       </div>
       <div class="activity-info">
         <div>
-          <h3>{{ title }}</h3>
+          <h3>{{ nombre }}</h3>
           <p>Fecha: {{ dates }}</p>
           <p>Horario: {{ schedule }}</p>
           <p>Días: {{ days }}</p>
@@ -27,8 +27,8 @@
 import { ChevronRightIcon } from 'lucide-vue-next'
 
 defineProps({
-  title: String,
-  image: String,
+  nombre: String,  
+  imagen: String, 
   dates: String,
   schedule: String,
   days: String
