@@ -4,84 +4,95 @@ namespace App\Http\Controllers;
 
 use App\Models\CentroCivico;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;  // Importa JsonResponse
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class CentroCivicoController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(): JsonResponse
+    public function index()
     {
-        $centrosCivicos = CentroCivico::all();
-        return response()->json($centrosCivicos);
+        try {
+            // Authorization check
+            $centroCivicos = CentroCivico::all();
+            return response()->json(['data' => $centroCivicos], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to retrieve centros civicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'direccion' => 'required|string|max:255',
         ]);
 
-        $centroCivico = new CentroCivico();
-        $centroCivico->nombre = $request->input('nombre');
-        $centroCivico->direccion = $request->input('direccion');
-        $centroCivico->save();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
-        return response()->json($centroCivico, 201); // 201 Created
+        try {
+            // Authorization check
+            $centroCivico = CentroCivico::create($request->all());
+            return response()->json(['data' => $centroCivico, 'message' => 'Centro civico created successfully'], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to create centro civico', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  \App\Models\CentroCivico  $centroCivico
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(CentroCivico $centroCivico): JsonResponse
+    public function show(CentroCivico $centroCivico)
     {
-        return response()->json($centroCivico);
+        try {
+            // Authorization check
+            return response()->json(['data' => $centroCivico], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to retrieve centro civico', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CentroCivico  $centroCivico
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, CentroCivico $centroCivico): JsonResponse
+    public function update(Request $request, CentroCivico $centroCivico)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'direccion' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'sometimes|string|max:255',
+            'direccion' => 'sometimes|string|max:255',
         ]);
 
-        $centroCivico->nombre = $request->input('nombre');
-        $centroCivico->direccion = $request->input('direccion');
-        $centroCivico->save();
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
-        return response()->json($centroCivico);
+        try {
+            // Authorization check
+            $centroCivico->update($request->all());
+            return response()->json(['data' => $centroCivico, 'message' => 'Centro civico updated successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to update centro civico', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\CentroCivico  $centroCivico
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(CentroCivico $centroCivico): JsonResponse
+    public function destroy(CentroCivico $centroCivico)
     {
-        $centroCivico->delete();
-
-        return response()->json(null, 204); // 204 No Content
+        try {
+            // Authorization check
+            $centroCivico->delete();
+            return response()->json(['message' => 'Centro civico deleted successfully'], Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete centro civico', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
