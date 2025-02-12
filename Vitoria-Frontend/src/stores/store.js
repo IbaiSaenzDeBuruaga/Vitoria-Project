@@ -14,7 +14,7 @@ export const useActivityStore = defineStore('activity', () => {
     error.value = null;
 
     try {
-      const response = await axios.get(`${API_URL}/activity`); // Ajusta el endpoint según tu API
+      const response = await axios.get(`${API_URL}/activity/all`); // Ajusta el endpoint según tu API
       activities.value = response.data.data; // Ajusta esto según la estructura de respuesta de tu API
     } catch (e) {
       error.value = e;
