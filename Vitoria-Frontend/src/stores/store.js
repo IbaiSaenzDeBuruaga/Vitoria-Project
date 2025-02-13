@@ -23,6 +23,7 @@ export const useActivityStore = defineStore('activity', () => {
       loading.value = false;
     }
   };
+  
 
   return { activities, loading, error, getActivities };
 });
