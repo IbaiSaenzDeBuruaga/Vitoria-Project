@@ -13,28 +13,14 @@ class Activity extends Model
     protected $fillable = [
         'nombre',
         'imagen',
+        'plazas'
     ];
 
-     /**
-     * Define the relationship with users.
-     *
-     * @return BelongsToMany
-     */
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class);
-    }
 
-     /**
-     * Define the relationship with centroCivicos.
-     *
-     * @return BelongsToMany
-     */
-    public function centroCivicos(): BelongsToMany
+
+    public function activitiesCentros()
     {
-        return $this->belongsToMany(CentroCivico::class, 'activivity_centros', 'activity_id', 'centro_id')
-            ->withPivot('fecha', 'horario_inicio')
-            ->withTimestamps();
+         return $this->hasMany(ActivityCentro::class);
     }
 
 }
