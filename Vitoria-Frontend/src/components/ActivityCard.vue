@@ -3,8 +3,8 @@
     <div class="activity-content">
       <div class="activity-image">
         <img
-          :src="image || '/placeholder.svg'"
-          :alt="title"
+          :src="imagen || '/placeholder.svg'"
+          :alt="nombre" 
         />
       </div>
       <div class="activity-info">
@@ -27,8 +27,8 @@
 import { ChevronRightIcon } from 'lucide-vue-next'
 
 defineProps({
-  nombre: String,  
-  imagen: String, 
+  nombre: String,
+  imagen: String,
   dates: String,
   schedule: String,
   days: String
