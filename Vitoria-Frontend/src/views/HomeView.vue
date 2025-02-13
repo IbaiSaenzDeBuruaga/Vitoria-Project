@@ -65,7 +65,7 @@
 
       <div v-if="activityStore.loading">Cargando actividades...</div>
       <div v-else-if="activityStore.error">Error: {{ activityStore.error }}</div>
-      <div v-else class="activities-grid">
+      <div v-else class="activities-grid" v-if="!showLogin && !showTMC">
         <activity-card
       v-for="activity in activityStore.activities"
       :key="activity.id"
