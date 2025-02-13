@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_user', function (Blueprint $table) {
+        Schema::create('activity_users', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('activity_id')->constrained('activity_centro');
-            
+
             $table->timestamps();
         });
     }

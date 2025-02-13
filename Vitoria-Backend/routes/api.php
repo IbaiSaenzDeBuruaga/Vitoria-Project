@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivityUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +13,7 @@ use App\Http\Controllers\CentroCivicoController;
 
 Route::prefix('main')->group(function () {
     Route::get('carga-inicial', [MainController::class, 'cargaInicial']);
-});     
+});
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -45,6 +46,10 @@ Route::prefix('activity')->group(function () {
     });
 });
 
+Route::prefix('activityUser')->group(function () {
+    Route::get('/all', [ActivityUserController::class, 'all']);
+    Route::post('/add', [ActivityUserController::class, 'addActivityUser']);
+});
 
 
 

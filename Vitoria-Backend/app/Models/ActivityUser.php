@@ -14,10 +14,11 @@ class ActivityUser extends Model
 
 
     public function user(){
-        return $this->belongsTo(User::class,'id_user','id');
+        return $this->belongsTo(User::class);
     }
+
     public function activity(){
-        return $this->belongsTo(ActivityCentro::class,'id_activity','id');
+        return $this->belongsTo(ActivityCentro::class);
     }
 
 }
