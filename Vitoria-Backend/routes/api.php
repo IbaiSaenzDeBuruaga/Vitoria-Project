@@ -16,6 +16,7 @@ Route::prefix('main')->group(function () {
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('login_page', [AuthController::class, 'loginPagina']);
     Route::post('register', [AuthController::class, 'register']);
     Route::middleware('auth:api')->group(function () {
         //Route::post('register', [AuthController::class, 'register'])->middleware('admin');
@@ -42,6 +43,7 @@ Route::prefix('activity')->group(function () {
         Route::put('{activity}/update' , [ActivityController::class,'update'])->middleware('admin');
         Route::delete('{activity}/delete',[ActivityController::class,'destroy'])->middleware('admin');
         Route::put('{activity}/centro/{centroCivico}',[ActivityController::class,'addCentroCivicoToActivity'])->middleware('admin');
+        Route::delete('{activity}/centro/{centroCivico}/delete',[ActivityController::class,'removeCentroCivicoFromActivity'])->middleware('admin');
     });
 });
 
