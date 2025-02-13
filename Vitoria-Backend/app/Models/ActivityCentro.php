@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ActivityCentro extends Model
 {
-    //
+    use HasFactory;
 
     protected $table = 'activity_centro';
 
@@ -21,7 +22,7 @@ class ActivityCentro extends Model
     ];
 
     public function activity(){
-        return $this->belongsTo(Activity::class,'id_activity','id');
+        return $this->belongsTo(Activity::class);
     }
     public function centro(){
         return $this->belongsTo(CentroCivico::class,'id_centro','id');

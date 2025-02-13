@@ -30,11 +30,13 @@
           <div class="footer-content">
             <!-- Logo Section -->
             <div class="footer-logo">
+              <!-- 
               <img
                 src="/placeholder.svg?height=80&width=80"
                 alt="Ayuntamiento de Vitoria-Gasteiz"
                 class="logo"
               />
+              -->
               <div class="address">
                 <p class="address-line">Plaza España 1, 01001 Vitoria-Gasteiz</p>
                 <p class="phone">010 (+34 945 16 11 00)</p>
@@ -60,6 +62,7 @@
         <div class="container">
           <div class="logos">
             <div class="logo-item">
+              <!-- 
               <img
                 src="/placeholder.svg?height=50&width=200"
                 alt="Financiado por la Unión Europea"
@@ -82,6 +85,8 @@
               alt="Ayuntamiento"
               class="city-logo"
             />
+            -->
+            </div>
           </div>
           <p class="copyright">
             © {{ currentYear }} Ayuntamiento de Vitoria-Gasteiz / Vitoria-Gasteizko Udala

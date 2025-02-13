@@ -106,7 +106,7 @@ class ActivityController extends Controller
             'hora_inicio' => 'required|date_format:H:i',
             'fecha_fin' => 'required|date',
             'hora_fin' => 'required|date_format:H:i',
-            'dias'=> 'required|string' 
+            'dias'=> 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -145,17 +145,13 @@ class ActivityController extends Controller
 
     public function allCentroCivicoActivity(){
         try{
-            $activitiesCentros = ActivityCentro::all();
-            $actividades = Activity::all();
-            return response()->json(['message' => 'Tumba la casa mami','ActividadesCentro'=>$activitiesCentros,
-            'Actividades'=>$actividades], Response::HTTP_OK);
-
-
-            $activities->centroCivicos();
+            $activitiesCentros = ActivityCentro::with('activity')->get();
+            return response()->json(['message' => 'Tumba la casa mami', 'ActividadesCentro'=>$activitiesCentros], Response::HTTP_OK);
 
         }
         catch(Exception $e){
             return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 }

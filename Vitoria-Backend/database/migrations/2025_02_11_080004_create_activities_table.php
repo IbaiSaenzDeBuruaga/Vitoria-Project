@@ -16,6 +16,10 @@ return new class extends Migration
 
             $table->string('nombre');
             $table->string('imagen')->nullable();
+            $table->integer('edad_min');
+            $table->integer('edad_max');
+            $table->enum('horario', ['matutino', 'vespertino']);
+            $table->enum('idioma', ['es', 'en', 'eu'])->default('es');
             $table->integer('plazas');
 
             $table->timestamps();
