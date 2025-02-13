@@ -9,7 +9,7 @@
           <p>Para operar en la Sede Electrónica es necesario identificarse con la BakQ u otro certificado digital.</p>
           <div class="option-content">
             <div class="cards-image">
-              <img src="/placeholder.svg?height=150&width=200" alt="Tarjetas BakQ" />
+              <!-- <img src="/placeholder.svg?height=150&width=200" alt="Tarjetas BakQ" /> -->
             </div>
             <button class="identify-button bakq">
               Identificarse con certificado
@@ -23,7 +23,7 @@
           <p>Para trámites online que <strong>NO requieren firma digital</strong>, es posible identificarse con Tarjeta Municipal Ciudadana.</p>
           <div class="option-content">
             <div class="tmc-card">
-              <img src="/placeholder.svg?height=150&width=200" alt="Tarjeta Municipal" />
+              <!-- <img src="/placeholder.svg?height=150&width=200" alt="Tarjeta Municipal" /> -->
             </div>
             <button class="identify-button tmc" @click="goToTMCLogin">
               Identificarse con TMC
