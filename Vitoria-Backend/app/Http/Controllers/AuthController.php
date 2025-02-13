@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -45,6 +46,55 @@ class AuthController extends Controller
         $user = auth()->user();
 
         return $this->respondWithToken($token);
+    }
+
+    public function loginPagina(Request $request){
+        try {
+            //code..
+            $validator = Validator::make($request->all(),[
+                "numeros_introducidos" => "required|string|max:3",
+                "posicion_1" => "required|integer|min:0|max:15",
+                "posicion_2" => "required|integer|min:0|max:15",
+                "posicion_3" => "required|integer|min:0|max:15",
+                "n_tarjeta" => "required|string|exists:users,n_tarjeta",
+                "password" => "required|string"
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+            }
+            $user = User::where('n_tarjeta', $request->n_tarjeta)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json(['error' => 'Datos de acceso incorrectos. Por favor, verifica tus credenciales.'], Response::HTTP_UNAUTHORIZED);
+            }
+    
+            // Si es administrador, devuelve el token y la información del rol
+            if ($user->rol === 'administrador') {
+                $token = auth()->login($user); // Genera el token para el usuario
+                return response()->json([
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'rol' => 'administrador',
+                ], Response::HTTP_OK);
+            }
+    
+            // Validación del juego de barcos para usuarios no administradores
+            if (!$this->validarNumeroTarjeta($request->posicion_1,$request->posicion_2,$request->posicion_3,$request->numeros_introducidos,$user->n_barcos)) {
+                return response()->json(['error' => 'Las letras introducidas no coinciden con las solicitadas.'], Response::HTTP_UNAUTHORIZED);
+            }
+    
+            // Si la validación del juego de barcos pasa, devuelve el token
+            $token = auth()->login($user); // Genera el token para el usuario
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'rol' => $user->rol, // Puedes devolver el rol del usuario aquí
+            ], Response::HTTP_OK);
+    
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'No se pudo iniciar la sesión', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public function unauthorized()
@@ -254,6 +304,26 @@ class AuthController extends Controller
             $numTarjeta .= rand(0, 9);
         }
         return $numTarjeta;
+    }
+
+    protected function validarNumeroTarjeta($posicion1, $posicion2, $posicion3, $numeroIntroducidos, $nBarcos) {
+        $nBarcos = strval($nBarcos); 
+        $longitudNBarcos = strlen($nBarcos);
+    
+        if ($posicion1 < 0 || $posicion1 >= $longitudNBarcos ||
+            $posicion2 < 0 || $posicion2 >= $longitudNBarcos ||
+            $posicion3 < 0 || $posicion3 >= $longitudNBarcos) {
+            return false; // Posición fuera de rango
+        }
+
+        
+        if ($nBarcos[$posicion1] == $numeroIntroducidos[0] &&
+            $nBarcos[$posicion2] == $numeroIntroducidos[1] &&
+            $nBarcos[$posicion3] == $numeroIntroducidos[2]) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
