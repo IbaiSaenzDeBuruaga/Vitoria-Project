@@ -78,8 +78,10 @@ class User extends Authenticatable implements JWTSubject, AuthenticatableContrac
      *
      * @return BelongsToMany
      */
-    public function activities(): BelongsToMany
-    {
-        return $this->belongsToMany(Activity::class);
+
+
+    public function activitiesUsers(){
+        return $this->hasMany(ActivityUser::class);
     }
+
 }

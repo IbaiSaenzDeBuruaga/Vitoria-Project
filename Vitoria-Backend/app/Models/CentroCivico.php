@@ -20,10 +20,8 @@ class CentroCivico extends Model
      *
      * @return BelongsToMany
      */
-    public function activities(): BelongsToMany
+    public function activitiesCentros()
     {
-         return $this->belongsToMany(Activity::class, 'activivity_centros', 'centro_id', 'activity_id')
-            ->withPivot('fecha', 'horario_inicio')
-            ->withTimestamps();
+         return $this->hasMany(ActivityCentro::class);
     }
 }

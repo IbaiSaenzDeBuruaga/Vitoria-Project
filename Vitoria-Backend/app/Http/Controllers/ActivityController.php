@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\ActivityCentro;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CentroCivico;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 class ActivityController extends Controller
@@ -100,8 +102,11 @@ class ActivityController extends Controller
     public function addCentroCivicoToActivity(Request $request, Activity $activity, CentroCivico $centroCivico)
     {
         $validator = Validator::make($request->all(), [
-            'fecha' => 'required|date',
-            'horario_inicio' => 'required|date_format:H:i',
+            'fecha_inicio' => 'required|date',
+            'hora_inicio' => 'required|date_format:H:i',
+            'fecha_fin' => 'required|date',
+            'hora_fin' => 'required|date_format:H:i',
+            'dias'=> 'required|string' 
         ]);
 
         if ($validator->fails()) {
@@ -109,25 +114,46 @@ class ActivityController extends Controller
         }
 
         try {
-            $activity->centroCivicos()->attach($centroCivico, [
-                'fecha' => $request->fecha,
-                'horario_inicio' => $request->horario_inicio,
-            ]);
 
-            return response()->json(['message' => 'Centro civico added to activity successfully'], Response::HTTP_OK);
+            $activityCentro = new ActivityCentro();
+            $activityCentro->activity_id = $activity->id;
+            $activityCentro->centro_id = $centroCivico->id;
+            $activityCentro->fecha_inicio = $request->fecha_inicio;
+            $activityCentro->fecha_fin = $request->fecha_fin;
+            $activityCentro->hora_inicio = $request->hora_inicio;
+            $activityCentro->hora_fin = $request->hora_fin;
+            $activityCentro->dias = $request->dias;
+            $activityCentro->save();
+
+
+            return response()->json(['message' => $activity->nombre.' añadida al '.$centroCivico->nombre.' con éxito'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to add centro civico to activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-public function removeCentroCivicoFromActivity(Activity $activity, CentroCivico $centroCivico)
-{
-     try {
-        $activity->centroCivicos()->detach($centroCivico);
+    public function removeCentroCivicoFromActivity(Activity $activity, CentroCivico $centroCivico)
+    {
+        try {
+            $activity->centroCivicos()->detach($centroCivico);
 
-        return response()->json(['message' => 'Centro civico removed from activity successfully'], Response::HTTP_OK);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Failed to remove centro civico from activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Centro civico removed from activity successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to remove centro civico from activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
-}
+
+    public function allCentroCivicoActivity(){
+        try{
+            $activities = Activity::with('centrosCivicos')->get();
+            return response()->json(['message' => 'Tumba la casa mami','data'=>$activities], Response::HTTP_OK);
+
+
+            $activities->centroCivicos();
+
+        }
+        catch(Exception $e){
+            return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
