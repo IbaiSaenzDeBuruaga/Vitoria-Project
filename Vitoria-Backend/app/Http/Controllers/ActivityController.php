@@ -145,8 +145,10 @@ class ActivityController extends Controller
 
     public function allCentroCivicoActivity(){
         try{
-            $activities = Activity::with('centrosCivicos')->get();
-            return response()->json(['message' => 'Tumba la casa mami','data'=>$activities], Response::HTTP_OK);
+            $activitiesCentros = ActivityCentro::all();
+            $actividades = Activity::all();
+            return response()->json(['message' => 'Tumba la casa mami','ActividadesCentro'=>$activitiesCentros,
+            'Actividades'=>$actividades], Response::HTTP_OK);
 
 
             $activities->centroCivicos();
