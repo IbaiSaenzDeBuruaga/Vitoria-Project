@@ -1,113 +1,136 @@
 <template>
   <div class="activities-portal">
-    <!-- Header -->
-    <header>
-      <div class="header-content">
-        <div class="logo-container" @click="resetToHome">
-          <img
-            src="../assets/images/logo.png"
-            alt="Vitoria Gasteiz"
-            class="logo"
-            style="cursor: pointer;"
-          />
-          <div class="logo-text">
-            <span class="bold">sede</span> <span>electrónica</span>
+    <Navbar @show-login="showLoginOptions" @go-home="goToHome" @logout="logout" />
+
+    <div class="main-container" v-if="!showLogin && !showTMC">
+      <!-- Sidebar with Filters -->
+      <aside class="filters-sidebar" :class="{ 'show-filters': filtersOpen }">
+        <div class="filters-header">
+          <h2>Filtros</h2>
+          <button v-if="isMobile" class="close-filters" @click="toggleMobileMenu">
+          </button>
+        </div>
+
+        <div class="filters-section">
+          <h3>Centro cívico</h3>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" />
+              <span>Iparralde</span>
+              <span class="count">(24)</span>
+            </label>
+            <!-- Más opciones aquí -->
           </div>
         </div>
-        <button class="connect-button" @click="showLoginOptions" v-if="!isLoggedIn">
-          <user-circle-2-icon />
-          Conectar
-        </button>
-      </div>
-    </header>
 
-    <!-- Filters -->
-    <div class="filters" v-if="!showLogin && !showTMC && !isLoggedIn">
-      <div class="filters-content">
-        <div class="filter-item">
-          <label>Centro cívico</label>
-          <select>
-            <option>Iparralde</option>
-          </select>
+        <div class="filters-section">
+          <h3>Edad</h3>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" />
+              <span>Adultos</span>
+              <span class="count">(156)</span>
+            </label>
+            <!-- Más opciones aquí -->
+          </div>
         </div>
 
-        <div class="filter-item">
-          <label>Edad</label>
-          <select>
-            <option>24</option>
-          </select>
+        <div class="filters-section">
+          <h3>Idioma</h3>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" />
+              <span>Castellano</span>
+              <span class="count">(89)</span>
+            </label>
+            <!-- Más opciones aquí -->
+          </div>
         </div>
 
-        <div class="filter-item">
-          <label>Idioma</label>
-          <select>
-            <option>Castellano</option>
-          </select>
+        <div class="filters-section">
+          <h3>Horario</h3>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" />
+              <span>Mañana</span>
+              <span class="count">(45)</span>
+            </label>
+            <!-- Más opciones aquí -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="content-header">
+          <button class="filter-toggle" @click="toggleFilters" v-if="isMobile">
+            <filter-icon />
+            Filtros
+          </button>
+          <div class="results-count">
+            {{ activityStore.activities.length }} actividades disponibles
+          </div>
+          <div class="sort-dropdown">
+            <select>
+              <option>Más relevante</option>
+              <option>Fecha más próxima</option>
+              <option>A-Z</option>
+            </select>
+          </div>
         </div>
 
-        <div class="filter-item">
-          <label>Horario</label>
-          <select>
-            <option>Mañana</option>
-          </select>
+        <div class="activities-grid">
+          <activity-card
+            v-for="activity in activityStore.activities"
+            :key="activity.id"
+            :nombre="activity.nombre"
+            :imagen="activity.imagen"
+            :dates="activity.dates"
+            :schedule="activity.schedule"
+            :days="activity.days"
+          />
         </div>
 
-        <button class="search-button">
-          <search-icon />
-        </button>
-      </div>
+        <div class="pagination">
+          <button
+            v-for="page in 5"
+            :key="page"
+            :class="['page-button', { active: page === 1 }]"
+          >
+            {{ page }}
+          </button>
+        </div>
+      </main>
     </div>
 
-    <!-- Activities Grid / Login Options -->
-    <main>
-      <LoginOptions v-if="showLogin && !isLoggedIn" @tmc-selected="showTMCLogin" />
-      <LoginTMC v-else-if="showTMC && !isLoggedIn" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess"/>
-
-      <div v-if="activityStore.loading">Cargando actividades...</div>
-      <div v-else-if="activityStore.error">Error: {{ activityStore.error }}</div>
-      <div v-else class="activities-grid" v-if="!showLogin && !showTMC">
-        <activity-card
-      v-for="activity in activityStore.activities"
-      :key="activity.id"
-      :nombre="activity.nombre"
-      :imagen="activity.imagen"
-      :dates="activity.dates" 
-      :schedule="activity.schedule" 
-      :days="activity.days"    
-    />
-      </div>
-    </main>
-
-    <!-- Pagination -->
-    <div class="pagination" v-if="!showLogin && !showTMC && !isLoggedIn">
-      <div class="pagination-content">
-        <button
-          v-for="page in 5"
-          :key="page"
-          :class="['page-button', { active: page === 1 }]"
-        >
-          {{ page }}
-        </button>
-      </div>
-    </div>
-    <Footer />
+    <LoginOptions v-if="showLogin" @tmc-selected="showTMCLogin" />
+    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { UserCircle2Icon, SearchIcon } from 'lucide-vue-next'
+import { ref, onMounted, computed } from 'vue'
+import { FilterIcon, XIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
+import { useActivityStore } from '../stores/store'
+import Navbar from '../components/Navbar.vue'
 import LoginOptions from '../components/LoginOptions.vue'
 import LoginTMC from '../components/LoginTMC.vue'
-import Footer from '../components/Footer.vue'
-import { useActivityStore } from '../stores/store'; // Importa el store de Pinia
+import { useAuthStore } from '../stores/authStore'
+import axios from 'axios'
+import { useRouter } from 'vue-router';
 
-const activityStore = useActivityStore(); // Usa el store
-
+const activityStore = useActivityStore()
+const filtersOpen = ref(false)
+const isMobile = computed(() => window.innerWidth < 768)
 const showLogin = ref(false)
 const showTMC = ref(false)
-const isLoggedIn = ref(false)
+const authStore = useAuthStore()
+const router = useRouter();
+
+const toggleFilters = () => {
+  filtersOpen.value = !filtersOpen.value
+}
 
 const showLoginOptions = () => {
   showLogin.value = true
@@ -119,156 +142,262 @@ const showTMCLogin = () => {
   showTMC.value = true
 }
 
-const resetToHome = () => {
+const handleLoginSuccess = () => {
   showLogin.value = false
   showTMC.value = false
-  isLoggedIn.value = false
 }
 
-const handleLoginSuccess = () => {
-    showLogin.value = false
-    showTMC.value = false
-    isLoggedIn.value = true
+const goToHome = () => {
+  showLogin.value = false;
+  showTMC.value = false;
 }
+const API_URL = import.meta.env.VITE_API_AUTH_URL;
+
+let idleTimeout;
+const idleDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+
+const resetIdleTimeout = () => {
+  clearTimeout(idleTimeout);
+  idleTimeout = setTimeout(logout, idleDuration);
+};
+
+const logout = async () => {
+  try {
+    await axios.get(`${API_URL}/auth/logout`);
+    authStore.clearToken();
+    router.push('/');
+    window.location.reload()
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
+
+const validateTokenOnLoad = async () => {
+  console.log('validateTokenOnLoad called');
+  if (authStore.token) {
+    console.log('Token found in authStore:', authStore.token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
+    console.log('Authorization header set:', axios.defaults.headers.common['Authorization']);
+    try {
+      const response = await axios.get(`${API_URL}/auth/validate-token`);
+      console.log('validate-token response:', response);
+      if (response.status !== 200) {
+        authStore.clearToken();
+        delete axios.defaults.headers.common['Authorization'];
+        console.log("token invalid - clearing token");
+      } else {
+        console.log("token is valid - keeping user logged in");
+      }
+    } catch (error) {
+      console.error('Token validation failed:', error);
+      authStore.clearToken();
+      delete axios.defaults.headers.common['Authorization'];
+      console.log("token invalid - clearing token");
+    }
+  } else {
+    console.log('No token found in authStore');
+  }
+};
 
 onMounted(() => {
-  activityStore.getActivities(); // Llama a la función para obtener las actividades al montar el componente
+  console.log('ActivitiesPortal mounted');
+  activityStore.getActivities();
+  validateTokenOnLoad();
+
+  // Start tracking activity for idle logout
+  window.addEventListener('mousemove', resetIdleTimeout);
+  window.addEventListener('keypress', resetIdleTimeout);
+  resetIdleTimeout(); // Initial call to set the timeout
 });
 </script>
 
 <style scoped>
 .activities-portal {
   min-height: 100vh;
+  background-color: #fff;
+}
+
+.main-container {
+  display: flex;
+  max-width: 1400px;
+  margin: 72px auto 0; /* Ajustado para el nuevo navbar */
+  padding: 0 24px;
+  gap: 2rem;
+}
+
+.filters-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  height: calc(100vh - 72px); /* Ajustado para the new navbar */
+  position: sticky;
+  top: 72px; /* Ajustado para the new navbar */
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filters-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #006758;
+}
+
+.close-filters {
+  display: none;
+}
+
+.filters-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filters-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.filter-options {
   display: flex;
   flex-direction: column;
-  background-color: white;
+  gap: 0.5rem;
 }
 
-header {
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 1rem;
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #374151;
 }
 
-.header-content {
+.count {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1.5rem 0;
+}
+
+.content-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  margin-bottom: 2rem;
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.filter-toggle {
+  display: none;
 }
 
-.logo {
-  height: 2.5rem;
-  width: 2.5rem;
-}
-
-.logo-text {
-  font-size: 1.125rem;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.connect-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #006758;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.filters {
-  background-color: #006758;
-  padding: 0.5rem 1rem;
-  border-bottom-right-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
-
-.filters-content {
-  max-width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-}
-
-.filter-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.filter-item label {
+.results-count {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: white;
+  color: #6b7280;
 }
 
-.filter-item select {
-  border-radius: 9999px;
+.sort-dropdown select {
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #374151;
   background-color: white;
-  padding: 0.25rem 1rem;
-  font-size: 0.875rem;
-}
-
-.search-button {
-  color: white;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-main {
-  flex: 1;
-  padding: 2rem 1rem;
 }
 
 .activities-grid {
-  max-width: auto;
-  margin: 0 auto;
   display: grid;
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 1200px) {
   .activities-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-.pagination {
-  border-top: 1px solid #e2e8f0;
-  padding: 1.5rem 0;
+@media (max-width: 767px) {
+  .filters-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 320px;
+    background: white;
+    z-index: 50;
+    transition: left 0.3s ease;
+  }
+
+  .show-filters {
+    left: 0;
+  }
+
+  .close-filters {
+    display: block;
+    border: none;
+    background: none;
+    color: #374151;
+    cursor: pointer;
+  }
+
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #006758;
+    border-radius: 4px;
+    background: white;
+    color: #006758;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .activities-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-container {
+    padding: 0 16px;
+  }
 }
 
-.pagination-content {
+.pagination {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
+  margin-top: 2rem;
 }
 
 .page-button {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 9999px;
-  border: 1px solid #006758;
-  color: #006758;
-  background: none;
+  height: 2.5rem;
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
   cursor: pointer;
 }
 
 .page-button.active {
   background-color: #006758;
   color: white;
+  border-color: #006758;
 }
 </style>

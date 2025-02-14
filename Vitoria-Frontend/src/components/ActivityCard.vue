@@ -1,30 +1,23 @@
 <template>
   <div class="activity-card">
-    <div class="activity-content">
-      <div class="activity-image">
-        <img
-          :src="imagen || '/placeholder.svg'"
-          :alt="nombre" 
-        />
-      </div>
-      <div class="activity-info">
-        <div>
-          <h3>{{ nombre }}</h3>
-          <p>Fecha: {{ dates }}</p>
-          <p>Horario: {{ schedule }}</p>
-          <p>Días: {{ days }}</p>
-        </div>
-        <button class="register-button">
-          Inscribirse
-          <chevron-right-icon />
-        </button>
-      </div>
+    <div class="activity-image">
+      <img :src="imagen || '/placeholder.svg'" :alt="nombre" />
+    </div>
+    <div class="activity-info">
+      <h3>{{ nombre }}</h3>
+      <p><calendar-icon /> {{ dates }}</p>
+      <p><clock-icon /> {{ schedule }}</p>
+      <p><calendar-days-icon /> {{ days }}</p>
+      <button class="register-button">
+        Inscribirse
+        <chevron-right-icon />
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ChevronRightIcon } from 'lucide-vue-next'
+import { ChevronRightIcon, CalendarIcon, ClockIcon, CalendarDaysIcon } from 'lucide-vue-next'
 
 defineProps({
   nombre: String,
@@ -37,66 +30,68 @@ defineProps({
 
 <style scoped>
 .activity-card {
-  overflow: hidden;
+  background-color: white;
   border-radius: 0.5rem;
-  background-color: #006758;
-  padding: 1rem;
-  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.activity-content {
-  display: flex;
-  align-content: space-between;
-  
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .activity-image {
-  position: relative;
-  height: 190px;
-  width: 300px;
-  flex-shrink: 0;
+  height: 200px;
   overflow: hidden;
-  border-radius: 0.5rem;
-  margin-right: 1rem;
 }
 
 .activity-image img {
-  object-fit: cover;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .activity-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: white;
+  padding: 1rem;
 }
 
 .activity-info h3 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+  color: #006758;
 }
 
 .activity-info p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
+  color: #4a5568;
   margin-bottom: 0.25rem;
 }
 
 .register-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
-  border-radius: 9999px;
-  background-color: white;
+  width: 100%;
+  border-radius: 0.25rem;
+  background-color: #006758;
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #006758;
-  align-self: flex-end;
+  color: white;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.register-button:hover {
+  background-color: #005647;
 }
 </style>

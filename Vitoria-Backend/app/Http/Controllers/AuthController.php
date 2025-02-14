@@ -70,7 +70,7 @@ class AuthController extends Controller
             }
     
             // Si es administrador, devuelve el token y la información del rol
-            if ($user->rol === 'administrador') {
+            if ($user->rol === 'admin') {
                 $token = auth()->login($user); // Genera el token para el usuario
                 return response()->json([
                     'access_token' => $token,
