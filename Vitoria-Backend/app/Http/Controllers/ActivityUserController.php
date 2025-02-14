@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityUser;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,9 +32,20 @@ class ActivityUserController extends Controller
             $activityuser->activity_id = $request->input('activity_id');
             $activityuser->save();
 
-            return response()->json(['message' => 'BRRRRRR, Real hasta la muerte', 'data' => $activityuser], Response::HTTP_OK);
+            return response()->json(['message' => 'Usuario asignado a la actividad', 'data' => $activityuser], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to add centro civico to activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function deleteActivityUser(ActivityUser $activityUser){
+        try{
+            if($activityUser){
+                $activityUser->delete();
+            }
+        }
+        catch(Exception $e){
+            return response()->json(['message' => 'No se ha podido borrar el usuario de la actividad', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
