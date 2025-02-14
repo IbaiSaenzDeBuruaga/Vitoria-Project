@@ -52,9 +52,11 @@ Route::prefix('activityUser')->group(function () {
     Route::get('/all', [ActivityUserController::class, 'all']);
     Route::middleware('auth:api')->group(function () {
         Route::post('/add', [ActivityUserController::class, 'addActivityUser']);
-        Route::get('/getMy',[ActivityUserController::class, 'tusActividades']);
+        Route::get('/getMy', [ActivityUserController::class, 'tusActividades']);
+        Route::delete('/delete', [ActivityUserController::class, 'deleteActivityUser']);
     });
 });
+
 
 
 

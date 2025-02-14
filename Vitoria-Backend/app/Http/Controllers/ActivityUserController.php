@@ -56,11 +56,15 @@ class ActivityUserController extends Controller
         }
     }
 
-    public function deleteActivityUser(ActivityUser $activityUser){
+    public function deleteActivityUser(Request $request)
+    {
         try{
-            if($activityUser){
+            $activityUser = ActivityUser::find($request->input('activity_id'));
+            if($activityUser && $activityUser->user_id == Auth()->id()){
                 $activityUser->delete();
+                return response()->json(['message' => 'Usuario borrado'], Response::HTTP_OK);
             }
+            return response()->json(['message' => 'El usuario no es propietario de este recurso'], Response::HTTP_UNAUTHORIZED);
         }
         catch(Exception $e){
             return response()->json(['message' => 'No se ha podido borrar el usuario de la actividad', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
