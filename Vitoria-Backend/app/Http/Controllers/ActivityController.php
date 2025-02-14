@@ -156,3 +156,4 @@ class ActivityController extends Controller
             return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+}
