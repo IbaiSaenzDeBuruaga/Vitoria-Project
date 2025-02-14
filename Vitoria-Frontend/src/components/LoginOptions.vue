@@ -11,7 +11,7 @@
             <div class="cards-image">
               <!-- <img src="/placeholder.svg?height=150&width=200" alt="Tarjetas BakQ" /> -->
             </div>
-            <button class="identify-button bakq">
+            <button class="identify-button bakq" @click="mostrarError('La BakQ está en mantenimiento, servicio no disponible')">
               Identificarse con certificado
             </button>
           </div>
@@ -43,6 +43,16 @@
         </section>
       </div>
     </div>
+
+    <div id="errorPopup" class="error-popup">
+    <div class="error-popup-content">
+        <span class="close-button" @click="cerrarPopup">×</span>
+        <h2>Error!</h2>
+        <p id="errorMessage">Ha ocurrido un error inesperado.</p>
+    </div>
+</div>
+
+
   </template>
   
   <script setup>
@@ -57,6 +67,27 @@
   const goToTMCLogin = () => {
     emit('tmc-selected')
   }
+
+
+  function mostrarError(mensaje) {
+    const popup = document.getElementById('errorPopup');
+    const mensajeError = document.getElementById('errorMessage');
+    mensajeError.textContent = mensaje; // Establece el mensaje de error
+    popup.style.display = 'block'; // Muestra el popup
+  }
+
+  const cerrarPopup = () => {
+      const popup = document.getElementById('errorPopup');
+      popup.style.display = 'none'; // Oculta el popup
+  }
+
+ 
+
+
+
+
+
+
   </script>
   
   <style scoped>
@@ -178,4 +209,42 @@
       width: 100%;
     }
   }
+
+  .error-popup {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Posición fija en la pantalla */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+.error-popup-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px; /* Ancho máximo */
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-button:hover {
+    color: #000;
+}
   </style>
