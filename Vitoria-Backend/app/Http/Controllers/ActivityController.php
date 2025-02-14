@@ -137,7 +137,7 @@ class ActivityController extends Controller
         try {
             $actividadCentro = ActivityCentro::where('activity_id',$activity->id)->where('centro_id',$centroCivico->id);
             $actividadCentro->delete();
-
+            
             return response()->json(['message' => 'Centro civico removed from activity successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to remove centro civico from activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -146,10 +146,8 @@ class ActivityController extends Controller
 
     public function allCentroCivicoActivity(){
         try{
-            $activitiesCentros = ActivityCentro::all();
-            $actividades = Activity::all();
-            return response()->json(['message' => 'Solicitud realizada con éxito','ActividadesCentro'=>$activitiesCentros,
-            'Actividades'=>$actividades], Response::HTTP_OK);
+            $activitiesCentros = ActivityCentro::with('activity')->get();
+            return response()->json(['message' => 'Solicitud realizada con éxito','ActividadesCentro'=>$activitiesCentros], Response::HTTP_OK);
 
         }
         catch(Exception $e){
