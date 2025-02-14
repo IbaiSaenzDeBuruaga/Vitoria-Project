@@ -110,7 +110,7 @@ const calculatePosition = (letter) => {
 
   const upperLetter = letter.toUpperCase();
   if (letterMap.hasOwnProperty(upperLetter)) {
-      return letterMap[upperLetter].toString().padStart(3, '0');
+      return letterMap[upperLetter]; // Return position as a number
   } else {
       console.warn(`Invalid letter found: ${letter}. Ignoring.`);
       return null;
@@ -118,34 +118,45 @@ const calculatePosition = (letter) => {
 };
 
 const handleSubmit = async () => {
-  // 1. Get the letter positions and numbers entered by the user
-  let letterPositions = '';
-  let numbersIntroducidos = '';
+  // Prepare data for the backend
+  const submissionData = {
+      numeros_introducidos: '', // To store the numbers entered by the user
+      posicion_1: null, // To store position of the first letter
+      posicion_2: null, // To store position of the second letter
+      posicion_3: null, // To store position of the third letter
+      n_tarjeta: formData.cardCode, // Card code
+      password: formData.password // Password
+  };
 
-  for (const letter of shipLetters.value) {
-      const letterPosition = calculatePosition(letter);  // <--- Call calculatePosition here
+  let isValid = true;
+  for (let i = 0; i < shipLetters.value.length; i++) {
+      const letter = shipLetters.value[i];
+      const letterPosition = calculatePosition(letter);
+      const numberEntered = formData[letter];
 
-      if (letterPosition === null) {
-          console.error("Invalid letter. Can't calculate position.");
-          return;
+      if (letterPosition === null || numberEntered === '') {
+          console.error("Invalid data. Can't calculate position.");
+          isValid = false;
+          break;
       }
-      const numberEntered = formData[letter];  // Get number entered
-
-      letterPositions += letterPosition; // concatenate numbers
-      numbersIntroducidos += numberEntered;
+      submissionData["posicion_" + (i + 1)] = letterPosition
+      submissionData.numeros_introducidos += numberEntered
   }
 
-  const submissionData = {
-      codigo: formData.cardCode,
-      password: formData.password,
-      posicion: letterPositions,
-      numerosIntroducidos: numbersIntroducidos
-  };
+  if (!isValid) {
+      return; // Exit if any validation fails
+  }
+
   try {
-      const response = await axios.post(`${API_URL}/auth/login`, submissionData);
+      const response = await axios.post(`${API_URL}/auth/login_page`, submissionData);
 
       if (response.status === 200) {
           console.log('Login successful:', response.data);
+          // Store token
+          const token = response.data.access_token;
+           // localStorage.setItem('token', token); // Save the token in localStorage
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
           emit('login-success'); // Notify the parent component
       } else {
           console.error('Login failed:', response);
@@ -157,8 +168,6 @@ const handleSubmit = async () => {
   }
 
   console.log('Form submitted:', JSON.stringify(submissionData));
-
-  //emit('login-success')
 }
 
 const backToLogin = () => {
@@ -168,155 +177,155 @@ const backToLogin = () => {
 
 <style scoped>
 .login-page {
-  min-height: 100vh;
-  background-color: #f8fafc;
-  padding: 2rem;
+min-height: 100vh;
+background-color: #f8fafc;
+padding: 2rem;
 }
 
 .login-container {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+max-width: 800px;
+margin: 0 auto;
+background-color: white;
+border-radius: 8px;
+padding: 2rem;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-  color: #1a1a1a;
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #006758;
+color: #1a1a1a;
+font-size: 2rem;
+margin-bottom: 2rem;
+padding-bottom: 1rem;
+border-bottom: 2px solid #006758;
 }
 
 .info-message {
-  background-color: #f0fdf4;
-  border-left: 4px solid #006758;
-  padding: 1rem;
-  margin-bottom: 2rem;
+background-color: #f0fdf4;
+border-left: 4px solid #006758;
+padding: 1rem;
+margin-bottom: 2rem;
 }
 
 .form-container {
-  background-color: #f8fafc;
-  padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+background-color: #f8fafc;
+padding: 2rem;
+border-radius: 8px;
+border: 1px solid #e2e8f0;
 }
 
 h2 {
-  color: #006758;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+color: #006758;
+font-size: 1.5rem;
+margin-bottom: 1rem;
 }
 
 .form-note {
-  color: #64748b;
-  margin-bottom: 2rem;
-  font-size: 0.875rem;
+color: #64748b;
+margin-bottom: 2rem;
+font-size: 0.875rem;
 }
 
 .login-form {
-  max-width: 500px;
+max-width: 500px;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+margin-bottom: 1.5rem;
 }
 
 label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #1a1a1a;
-  font-weight: 500;
+display: block;
+margin-bottom: 0.5rem;
+color: #1a1a1a;
+font-weight: 500;
 }
 
 input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  font-size: 1rem;
+width: 100%;
+padding: 0.75rem;
+border: 1px solid #e2e8f0;
+border-radius: 4px;
+font-size: 1rem;
 }
 
 input:focus {
-  outline: none;
-  border-color: #006758;
-  box-shadow: 0 0 0 2px rgba(0, 103, 88, 0.1);
+outline: none;
+border-color: #006758;
+box-shadow: 0 0 0 2px rgba(0, 103, 88, 0.1);
 }
 
 .password-input {
-  position: relative;
+position: relative;
 }
 
 .toggle-password {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.25rem;
+position: absolute;
+right: 0.75rem;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: #64748b;
+cursor: pointer;
+padding: 0.25rem;
 }
 
 .ships-game {
-  margin-bottom: 2rem;
+margin-bottom: 2rem;
 }
 
 .ships-game h3 {
-  color: #1a1a1a;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+color: #1a1a1a;
+font-size: 1rem;
+margin-bottom: 1rem;
 }
 
 .ships-inputs {
-  display: flex;
-  gap: 1rem;
+display: flex;
+gap: 1rem;
 }
 
 .ship-input {
-  width: 60px;
+width: 60px;
 }
 
 .ship-input input {
-  text-align: center;
-  font-size: 1.25rem;
+text-align: center;
+font-size: 1.25rem;
 }
 
 .submit-button {
-  background-color: #006758;
-  color: white;
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.2s ease;
+background-color: #006758;
+color: white;
+padding: 0.75rem 2rem;
+border: none;
+border-radius: 4px;
+font-weight: 500;
+cursor: pointer;
+width: 100%;
+transition: background-color 0.2s ease;
 }
 
 .submit-button:hover {
-  background-color: #005447;
+background-color: #005447;
 }
 
 @media (max-width: 640px) {
-  .login-page {
-      padding: 1rem;
-  }
+.login-page {
+    padding: 1rem;
+}
 
-  .form-container {
-      padding: 1rem;
-  }
+.form-container {
+    padding: 1rem;
+}
 
-  .ships-inputs {
-      flex-direction: column;
-      gap: 0.5rem;
-  }
+.ships-inputs {
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
-  .ship-input {
-      width: 100%;
-  }
+.ship-input {
+    width: 100%;
+}
 }
 </style>

@@ -20,7 +20,11 @@ class Activity extends Model
 
     public function activitiesCentros()
     {
-         return $this->hasMany(ActivityCentro::class);
+         return $this->belongsToMany(ActivityCentro::class);
+    }
+
+    public function centro(){
+        return $this->belongsToMany(CentroCivico::class);
     }
 
 }

@@ -106,7 +106,7 @@ class ActivityController extends Controller
             'hora_inicio' => 'required|date_format:H:i',
             'fecha_fin' => 'required|date',
             'hora_fin' => 'required|date_format:H:i',
-            'dias'=> 'required|string' 
+            'dias'=> 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -151,13 +151,9 @@ class ActivityController extends Controller
             return response()->json(['message' => 'Solicitud realizada con éxito','ActividadesCentro'=>$activitiesCentros,
             'Actividades'=>$actividades], Response::HTTP_OK);
 
-
-            $activities->centroCivicos();
-
         }
         catch(Exception $e){
             return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }
