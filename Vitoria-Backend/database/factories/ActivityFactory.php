@@ -17,7 +17,7 @@ class ActivityFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre' => $this->faker->name(),
+            'nombre' => $this->faker->sentence(3),
             'edad_min' => $this->faker->numberBetween($min = 3, $max =  18),
             'edad_max' => $this->faker->numberBetween($min = 18, $max =  100),
             'horario' => $this->faker->randomElement(['matutino', 'vespertino']),
