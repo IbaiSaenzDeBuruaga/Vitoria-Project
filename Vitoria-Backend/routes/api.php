@@ -50,7 +50,10 @@ Route::prefix('activity')->group(function () {
 
 Route::prefix('activityUser')->group(function () {
     Route::get('/all', [ActivityUserController::class, 'all']);
-    Route::post('/add', [ActivityUserController::class, 'addActivityUser']);
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/add', [ActivityUserController::class, 'addActivityUser']);
+        Route::get('/getMy',[ActivityUserController::class, 'tusActividades']);
+    });
 });
 
 
