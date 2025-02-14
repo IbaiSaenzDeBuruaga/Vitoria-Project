@@ -31,7 +31,7 @@
             <!-- Logo Section -->
             <div class="footer-logo">
               <img
-                src="/placeholder.svg?height=80&width=80"
+                src=""
                 alt="Ayuntamiento de Vitoria-Gasteiz"
                 class="logo"
               />
@@ -61,24 +61,24 @@
           <div class="logos">
             <div class="logo-item">
               <img
-                src="/placeholder.svg?height=50&width=200"
+                src=""
                 alt="Financiado por la Unión Europea"
                 class="eu-logo"
               />
               <span>NextGenerationEU</span>
             </div>
             <img
-              src="/placeholder.svg?height=50&width=200"
+              src=""
               alt="Gobierno de España"
               class="gov-logo"
             />
             <img
-              src="/placeholder.svg?height=50&width=200"
+              src=""
               alt="Plan de Recuperación"
               class="plan-logo"
             />
             <img
-              src="/placeholder.svg?height=50&width=80"
+              src=""
               alt="Ayuntamiento"
               class="city-logo"
             />
