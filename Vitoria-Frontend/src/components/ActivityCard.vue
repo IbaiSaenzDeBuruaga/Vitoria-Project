@@ -8,7 +8,7 @@
       <p><calendar-icon /> {{ dates }}</p>
       <p><clock-icon /> {{ schedule }}</p>
       <p><calendar-days-icon /> {{ days }}</p>
-      <button class="register-button">
+      <button class="register-button" @click="handleRegister">
         Inscribirse
         <chevron-right-icon />
       </button>
@@ -18,15 +18,29 @@
 
 <script setup>
 import { ChevronRightIcon, CalendarIcon, ClockIcon, CalendarDaysIcon } from 'lucide-vue-next'
+import { useAuthStore } from '../stores/authStore';
 
-defineProps({
+const props = defineProps({
   nombre: String,
   imagen: String,
   dates: String,
   schedule: String,
-  days: String
-})
+  days: String,
+  id: Number
+});
+
+const emit = defineEmits(['register', 'show-login']);
+const authStore = useAuthStore();
+
+const handleRegister = () => {
+  if (authStore.isLoggedIn) {
+    emit('register', props.id);
+  } else {
+    emit('show-login');
+  }
+};
 </script>
+
 
 <style scoped>
 .activity-card {

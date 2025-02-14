@@ -36,7 +36,12 @@
           <a href="#" class="nav-link">Actividades</a>
           <a href="#" class="nav-link">Centros</a>
           <a href="#" class="nav-link">Ayuda</a>
-          <a v-if="authStore.isLoggedIn" href="#" class="nav-link">Mis Actividades</a>
+          <a
+            v-if="authStore.isLoggedIn"
+            @click="emit('show-my-activities')"
+            class="nav-link"
+            >Mis Actividades</a
+          >
         </div>
   
         <!-- Auth Button -->
@@ -65,7 +70,7 @@
   
   const isMobile = computed(() => window.innerWidth < 768)
   const mobileMenuOpen = ref(false)
-  const emit = defineEmits(['show-login', 'go-home', 'logout']);
+  const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities']);
   
   const authStore = useAuthStore()
   

@@ -1,14 +1,19 @@
 <template>
   <div class="activities-portal">
-    <Navbar @show-login="showLoginOptions" @go-home="goToHome" @logout="logout" />
+    <Navbar
+      @show-login="showLoginOptions"
+      @go-home="goToHome"
+      @logout="logout"
+      @show-my-activities="showMyActivities"
+    />
 
-    <div class="main-container" v-if="!showLogin && !showTMC">
+    <MisActividades v-if="showMyActivitiesComponent" />
+
+    <div v-else-if="!showLogin && !showTMC" class="main-container">
       <!-- Sidebar with Filters -->
       <aside class="filters-sidebar" :class="{ 'show-filters': filtersOpen }">
         <div class="filters-header">
           <h2>Filtros</h2>
-          <button v-if="isMobile" class="close-filters" @click="toggleMobileMenu">
-          </button>
         </div>
 
         <div class="filters-section">
@@ -88,6 +93,9 @@
             :dates="activity.dates"
             :schedule="activity.schedule"
             :days="activity.days"
+            :id="activity.id"
+            @register="handleRegister"
+            @show-login="showLoginOptions"
           />
         </div>
 
@@ -110,7 +118,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { FilterIcon, XIcon } from 'lucide-vue-next'
+import { FilterIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
 import { useActivityStore } from '../stores/store'
 import Navbar from '../components/Navbar.vue'
@@ -119,6 +127,7 @@ import LoginTMC from '../components/LoginTMC.vue'
 import { useAuthStore } from '../stores/authStore'
 import axios from 'axios'
 import { useRouter } from 'vue-router';
+import MisActividades from '../components/MisActividades.vue';
 
 const activityStore = useActivityStore()
 const filtersOpen = ref(false)
@@ -127,6 +136,8 @@ const showLogin = ref(false)
 const showTMC = ref(false)
 const authStore = useAuthStore()
 const router = useRouter();
+
+const showMyActivitiesComponent = ref(false);
 
 const toggleFilters = () => {
   filtersOpen.value = !filtersOpen.value
@@ -150,6 +161,10 @@ const handleLoginSuccess = () => {
 const goToHome = () => {
   showLogin.value = false;
   showTMC.value = false;
+  showMyActivitiesComponent.value = false
+}
+const showMyActivities = () => {
+  showMyActivitiesComponent.value = !showMyActivitiesComponent.value;
 }
 const API_URL = import.meta.env.VITE_API_AUTH_URL;
 
@@ -199,6 +214,17 @@ const validateTokenOnLoad = async () => {
   }
 };
 
+const handleRegister = async (activityId) => {
+  try {
+    const response = await axios.post(`${API_URL}/activityUser/add`, { activity_id: activityId });
+    console.log('Registration successful:', response.data);
+    // Handle success, e.g., show a success message
+  } catch (error) {
+    console.error('Registration failed:', error);
+    // Handle error, e.g., show an error message
+  }
+};
+
 onMounted(() => {
   console.log('ActivitiesPortal mounted');
   activityStore.getActivities();
@@ -220,7 +246,7 @@ onMounted(() => {
 .main-container {
   display: flex;
   max-width: 1400px;
-  margin: 72px auto 0; /* Ajustado para el nuevo navbar */
+  margin: 72px auto 0;
   padding: 0 24px;
   gap: 2rem;
 }
@@ -229,9 +255,9 @@ onMounted(() => {
   width: 280px;
   flex-shrink: 0;
   padding: 1.5rem;
-  height: calc(100vh - 72px); /* Ajustado para the new navbar */
+  height: calc(100vh - 72px);
   position: sticky;
-  top: 72px; /* Ajustado para the new navbar */
+  top: 72px;
   overflow-y: auto;
   border-right: 1px solid #e5e7eb;
 }
@@ -343,35 +369,6 @@ onMounted(() => {
 
   .show-filters {
     left: 0;
-  }
-
-  .close-filters {
-    display: block;
-    border: none;
-    background: none;
-    color: #374151;
-    cursor: pointer;
-  }
-
-  .filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid #006758;
-    border-radius: 4px;
-    background: white;
-    color: #006758;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  .activities-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .main-container {
-    padding: 0 16px;
   }
 }
 
