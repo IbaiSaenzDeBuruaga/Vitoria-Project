@@ -1,12 +1,6 @@
-<!-- Navbar.vue -->
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <!-- Mobile Menu Button -->
-      <button class="mobile-menu" v-if="isMobile" @click="toggleMobileMenu">
-        <menu-icon />
-      </button>
-
       <!-- Logo -->
       <div class="logo-section" @click="emit('go-home')">
         <img
@@ -15,20 +9,8 @@
           class="logo"
         />
         <div class="logo-text">
-          <span class="bold">sede</span>
-          <span>electrónica</span>
-        </div>
-      </div>
-
-      <!-- Search Bar -->
-      <div class="search-section">
-        <div class="search-bar">
-          <search-icon size="20" class="search-icon" />
-          <input
-            type="text"
-            placeholder="Buscar actividades..."
-            class="search-input"
-          />
+          <span>Sede</span>
+          <span> Electrónica</span>
         </div>
       </div>
 
@@ -59,17 +41,21 @@
           Desconectar
         </button>
       </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu" @click="toggleMobileMenu">
+        <menu-icon />
+      </button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { MenuIcon, SearchIcon, UserCircle2Icon } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { MenuIcon, UserCircle2Icon } from 'lucide-vue-next'
 import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
-const isMobile = computed(() => window.innerWidth < 768)
 const mobileMenuOpen = ref(false)
 const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities']);
 
@@ -98,31 +84,20 @@ const toggleMobileMenu = () => {
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
-  justify-content:end;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
-}
-
-.mobile-menu {
-  display: none;
-  background: none;
-  border: none;
-  color: #006758;
-  cursor: pointer;
-  padding: 8px;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  min-width: 160px;
-  cursor: pointer; /* Add pointer cursor for clickable logo */
+  cursor: pointer;
 }
 
 .logo {
-  height: 32px;
-  width: 32px;
+  height: 10%;
+  width: 10%;
 }
 
 .logo-text {
@@ -134,57 +109,13 @@ const toggleMobileMenu = () => {
   font-weight: 700;
 }
 
-.search-section {
-  flex: 1;
-  max-width: 600px;
-  margin: 0 1rem;
-}
-
-.search-bar {
-  display: flex;
-  align-items: center;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 9999px;
-  padding: 0.5rem 1rem;
-  transition: all 0.2s ease;
-}
-
-.search-bar:focus-within {
-  background: white;
-  border-color: #006758;
-  box-shadow: 0 0 0 2px rgba(0, 103, 88, 0.1);
-}
-
-.search-icon {
-  color: #6b7280;
-  margin-right: 0.5rem;
-}
-
-.search-input {
-  border: none;
-  background: transparent;
-  width: 100%;
-  font-size: 0.875rem;
-  color: #111827;
-}
-
-.search-input:focus {
-  outline: none;
-}
-
-.search-input::placeholder {
-  color: #6b7280;
-}
-
 .nav-links {
   display: flex;
-  gap: 1.5rem;
-  margin-right: 1rem;
+  gap: 2rem;
 }
 
 .nav-link {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: #374151;
   text-decoration: none;
   white-space: nowrap;
@@ -196,44 +127,53 @@ const toggleMobileMenu = () => {
 }
 
 .auth-buttons {
-  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .login-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border: 1px solid #006758;
   border-radius: 4px;
   background: white;
   color: #006758;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .login-button:hover {
-  background: #f3f4f6;
+  background: #006758;
+  color: white;
+}
+
+.mobile-menu {
+  display: none;
+  background: none;
+  border: none;
+  color: #006758;
+  cursor: pointer;
+  padding: 8px;
 }
 
 @media (max-width: 1024px) {
   .nav-links {
     display: none;
   }
-}
 
-@media (max-width: 768px) {
   .mobile-menu {
     display: block;
   }
+}
 
+@media (max-width: 768px) {
   .logo-text {
-    display: none;
-  }
-
-  .search-section {
     display: none;
   }
 }
 </style>
+
