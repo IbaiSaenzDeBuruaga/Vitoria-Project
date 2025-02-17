@@ -18,10 +18,10 @@ class ActivityController extends Controller
     public function all(Request $request)
     {
         try {
-            $perPage = $request->input('per_page', 10); 
+            $perPage = $request->input('per_page', 10);
             $activities = Activity::paginate($perPage);
 
-            return response()->json($activities, Response::HTTP_OK);  
+            return response()->json($activities, Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to retrieve activities', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -138,7 +138,7 @@ class ActivityController extends Controller
         try {
             $actividadCentro = ActivityCentro::where('activity_id',$activity->id)->where('centro_id',$centroCivico->id);
             $actividadCentro->delete();
-            
+
             return response()->json(['message' => 'Centro civico removed from activity successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to remove centro civico from activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -152,6 +152,17 @@ class ActivityController extends Controller
 
         }
         catch(Exception $e){
+            return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function countActivitiesPorCentro($centro_id)
+    {
+        try {
+            $countActividadesPorCentro = ActivityCentro::where('centro_id', $centro_id)->count();
+            return response()->json(['message' => 'Er diablo, MamaHuevo', 'totalActividades' => $countActividadesPorCentro], Response::HTTP_OK);
+
+        } catch (Exception $e){
             return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
