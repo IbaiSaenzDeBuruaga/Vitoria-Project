@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     $PHPIZE_DEPS \
     libzip-dev \
     zip \
+    cron \ 
     && docker-php-ext-install pdo pdo_mysql zip
 
 # Instala Composer
@@ -19,9 +20,7 @@ COPY . /var/www/html
 
 # Instala las dependencias de Laravel usando Composer
 RUN composer install --no-scripts
-
-# Genera la clave de la aplicación Laravel (puedes descomentar si es necesario)
-# RUN php artisan key:generate
+RUN php artisan storage:link
 
 # Cambia el propietario de los archivos al usuario www-data
 RUN chown -R www-data:www-data /var/www/html
@@ -38,5 +37,20 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available
 # Habilita mod_rewrite para URLs amigables de Laravel
 RUN a2enmod rewrite
 
-# Comando por defecto al arrancar el contenedor
-CMD ["apache2-foreground"]
+# ----------------------------------- Configuración del Cron Job -----------------------------------
+
+# Copia el script de configuración del cron job al contenedor
+COPY scriptMantenimientos.sh /usr/local/bin/
+
+# Haz el script ejecutable
+RUN chmod +x /usr/local/bin/scriptMantenimientos.sh
+
+# Ejecuta el script para configurar el cron job
+RUN /usr/local/bin/scriptMantenimientos.sh
+
+# Inicia el servicio cron en segundo plano
+RUN service cron start
+
+# ----------------------------------- Comando por defecto modificado -----------------------------------
+# Ejecuta Apache en primer plano y mantiene cron corriendo en segundo plano
+CMD service cron start && apache2-foreground

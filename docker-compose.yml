@@ -1,0 +1,82 @@
+services:
+  laravel:
+    build:
+      context: ./Hefesto-Backend
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    ports:
+      - "8000:80"
+    networks:
+      - app-network
+    environment:
+      - APP_NAME=Hefesto
+      - APP_ENV=local
+      - APP_KEY=base64:xIDGkjA9OBCNHeIsTb4kGfqwqpB3t8z4ywQlPtW1L90=
+      - JWT_SECRET=YyQJwvGf3CWj8WPMXMgbp0ZZoBo2EBg7b6I2XG05TLpGwQu1smpQ7d4GIwdQ6x7t
+      - APP_DEBUG=true
+      - APP_TIMEZONE=Europe/Madrid
+      - APP_URL=http://localhost
+      - APP_LOCALE=en
+      - APP_FALLBACK_LOCALE=en
+      - APP_FAKER_LOCALE=en_US
+      - APP_MAINTENANCE_DRIVER=file
+      - PHP_CLI_SERVER_WORKERS=4
+      - BCRYPT_ROUNDS=12
+      - LOG_CHANNEL=stack
+      - LOG_STACK=single
+      - LOG_DEPRECATIONS_CHANNEL=null
+      - LOG_LEVEL=debug
+      - DB_CONNECTION=mysql
+      - DB_HOST=150.241.37.58
+      - DB_PORT=3306
+      - DB_DATABASE=grupo6_2425
+      - DB_USERNAME=grupo6_2425
+      - DB_PASSWORD=F(t[Hj-rC5XRKtGj
+      - SESSION_DRIVER=database
+      - SESSION_LIFETIME=120
+      - SESSION_ENCRYPT=false
+      - SESSION_PATH=/
+      - SESSION_DOMAIN=null
+      - BROADCAST_CONNECTION=log
+      - FILESYSTEM_DISK=local
+      - QUEUE_CONNECTION=database
+      - CACHE_STORE=database
+      - CACHE_PREFIX=
+      - MEMCACHED_HOST=127.0.0.1
+      - REDIS_CLIENT=phpredis
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - MAIL_MAILER=log
+      - MAIL_SCHEME=null
+      - MAIL_HOST=127.0.0.1
+      - MAIL_PORT=2525
+      - MAIL_USERNAME=null
+      - MAIL_PASSWORD=null
+      - MAIL_FROM_ADDRESS="hello@example.com"
+      - MAIL_FROM_NAME=Hefesto
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_BUCKET=
+      - AWS_USE_PATH_STYLE_ENDPOINT=false
+      - VITE_APP_NAME=Hefesto
+ 
+
+  frontend:
+    build:
+      context: ./Hefesto-Frontend
+      dockerfile: Dockerfile
+    container_name: vue-app
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - laravel
+    environment:
+      - VITE_API_AUTH_URL=http://laravel:8000/api/v1
+      - VITE_IMAGE_URL=http://laravel:8000/storage/
+networks:
+  app-network:
+    driver: bridge

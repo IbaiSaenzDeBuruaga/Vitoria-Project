@@ -47,7 +47,7 @@
     <div id="errorPopup" class="error-popup">
     <div class="error-popup-content">
         <span class="close-button" @click="cerrarPopup">×</span>
-        <h2>Error!</h2>
+        <h2>En Mantenimiento</h2>
         <p id="errorMessage">Ha ocurrido un error inesperado.</p>
     </div>
 </div>
