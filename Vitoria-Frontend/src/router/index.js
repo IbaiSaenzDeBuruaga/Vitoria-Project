@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
+import AdminView from '@/views/AdminView.vue';
 //import comprobarToken from './authManager';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
@@ -11,6 +12,11 @@ const routes = [
     path: '/',
     component: HomeView,
   },
+  {
+    path: '/admin',
+    component: AdminView,
+    meta: { serAdmin: true},
+  }
   
 ];
 
@@ -37,7 +43,7 @@ const comprobarToken = async () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('Token válido:', response.data);
+      console.log('Token válido:', response.data.data.rol);
       return{
         isValid: true,
         rol: response.data.data.rol,
@@ -64,16 +70,16 @@ const comprobarToken = async () => {
 // Añade un guard de navegación global
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token');
-  if (to.matched.some(record => record.meta.estarAutenticado)) {
+  if (to.matched.some(record => record.meta.serAdmin)) {
     if (token) {
       try {
         const { isValid, rol } = await comprobarToken();
         // Si la validación es exitosa, permite el acceso
         const permisoAdmin = rutasAdmin.includes(to.path);
 
-        if (permisoAdmin && rol !== 'administrador') {
+        if (permisoAdmin && rol !== 'admin') {
           alert('No tienes permisos para acceder a esta página');
-          next('/home');
+          next('/');
         } else {
           next();
         }
