@@ -1,7 +1,9 @@
+//HomeView.vue
 <template>
   <div class="activities-portal">
     <Navbar
       @show-login="showLoginOptions"
+      @show-login-tmc="() => showTMCLogin(false)"
       @go-home="goToHome"
       @logout="logout"
       @show-my-activities="showMyActivities"
@@ -59,14 +61,6 @@
             </label>
           </div>
         </div>
-
-       
-
-        <!-- REMOVED THIS SECTION -->
-        <!-- <p>Centros: {{ selectedCentro }}</p>
-        <p>Edad: {{ selectedEdad }}</p>
-        <p>Idioma: {{ selectedIdioma }}</p>
-        <p>Horario: {{ selectedHorario }}</p> -->
       </aside>
 
       <!-- Main Content -->
@@ -98,7 +92,7 @@
             :days="activity.dias"
             :id="activity.id"
             @register="handleRegister"
-            @show-login="showLoginOptions"
+            @show-login="() => showTMCLogin(true)"
           />
         </div>
 
@@ -115,8 +109,8 @@
       </main>
     </div>
 
-    <LoginOptions v-if="showLogin" @tmc-selected="showTMCLogin" />
-    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" />
+    <LoginOptions v-if="showLogin" @tmc-selected="() => showTMCLogin(false)" />
+    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" :from-register="showTMCFromRegister" />
   </div>
 </template>
 
@@ -146,7 +140,7 @@ const selectedCentro = ref([]);
 const selectedEdad = ref([]);
 const selectedIdioma = ref([]);
 const selectedHorario = ref([]);
-const sortBy = ref('relevance'); // 'relevance', 'date', 'az'
+const sortBy = ref('date'); // 'relevance', 'date', 'az'
 
 const centros = ref([]);
 const allActivities = ref([]); // Store all activities here
@@ -179,15 +173,24 @@ const showLoginOptions = () => {
   showTMC.value = false
 }
 
-const showTMCLogin = () => {
-  showLogin.value = false
-  showTMC.value = true
-}
+const showTMCLogin = (fromRegister = false) => { // Add fromRegister parameter
+  showLogin.value = false;
+  showTMC.value = true;
+  showTMCFromRegister.value = fromRegister; // Set the prop value
+};
 
-const handleLoginSuccess = () => {
-  showLogin.value = false
-  showTMC.value = false
-}
+// Add this ref to manage the fromRegister prop for LoginTMC
+const showTMCFromRegister = ref(false);
+
+
+// MODIFICADO:  Recarga las actividades
+const handleLoginSuccess = async () => {
+  showLogin.value = false;
+  showTMC.value = false;
+  await fetchActivities(); // Recarga las actividades
+  router.push('/'); // Redirige al inicio, *después* de recargar.  Importante!
+
+};
 
 const goToHome = () => {
   showLogin.value = false;
@@ -221,37 +224,34 @@ const logout = async () => {
 };
 
 const validateTokenOnLoad = async () => {
-    console.log('validateTokenOnLoad called');
     if (authStore.token) {
-        console.log('Token found in authStore:', authStore.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
-        console.log('Authorization header set:', axios.defaults.headers.common['Authorization']);
         try {
             const response = await axios.get(`${API_URL}/auth/validate-token`);
-            console.log('validate-token response:', response);
             if (response.status !== 200) {
                 authStore.clearToken();
                 delete axios.defaults.headers.common['Authorization'];
-                console.log("token invalid - clearing token");
-            } else {
-                console.log("token is valid - keeping user logged in");
             }
         } catch (error) {
             console.error('Token validation failed:', error);
             authStore.clearToken();
             delete axios.defaults.headers.common['Authorization'];
-            console.log("token invalid - clearing token");
         }
-    } else {
-        console.log('No token found in authStore');
     }
 };
 
 const handleRegister = async (activityId) => {
+    if (!authStore.isLoggedIn) {
+      showTMCLogin(true); // Pass 'true' to indicate coming from registration
+      return;
+    }
+
+
   try {
     const response = await axios.post(`${API_URL}/activityUser/add`, { activity_id: activityId });
     console.log('Registration successful:', response.data);
     // Handle success, e.g., show a success message
+      fetchActivities();
   } catch (error) {
     console.error('Registration failed:', error);
     // Handle error, e.g., show an error message
@@ -308,20 +308,24 @@ const paginatedActivities = computed(() => {
   return filteredActivities.value.slice(start, end);
 });
 
+// NUEVA FUNCIÓN:  Para recargar las actividades
+const fetchActivities = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/activity/all`);
+    allActivities.value = response.data.ActividadesCentro;
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
 
 onMounted(async () => {
   // Fetch centros
   await centrosStore.fetchAllCentros();
   centros.value = centrosStore.allCentros;
 
-  // Fetch all activities
-  try {
-    const response = await axios.get(`${API_URL}/activity/all`);
-    allActivities.value = response.data.ActividadesCentro; // Store *all* activities
-    console.log(allActivities.value);
-  } catch (error) {
-    console.error("Error fetching activities:", error);
-  }
+  // Fetch all activities  <--  Ahora usamos la función
+  await fetchActivities();
 
     validateTokenOnLoad();
 
@@ -444,7 +448,8 @@ watch(filteredActivities, () => {
 
 .main-content {
   flex: 1;
-  padding: 1.5rem 0;
+  padding: 1.5rem;
+
 }
 
 .content-header {

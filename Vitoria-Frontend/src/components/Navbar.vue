@@ -1,3 +1,4 @@
+//navbar
 <template>
   <nav class="navbar">
     <div class="navbar-container">
@@ -32,7 +33,7 @@
         <button
           v-if="!authStore.isLoggedIn"
           class="login-button"
-          @click="$emit('show-login')"
+          @click="$emit('show-login-tmc')"
         >
           <user-circle-2-icon />
           Conectar
@@ -57,7 +58,7 @@ import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
 const mobileMenuOpen = ref(false)
-const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities']);
+const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']); // Added 'show-login-tmc'
 
 const authStore = useAuthStore()
 
@@ -67,6 +68,7 @@ const toggleMobileMenu = () => {
 </script>
 
 <style scoped>
+/* (The styles remain the same) */
 .navbar {
   height: 72px;
   background: white;
@@ -176,4 +178,3 @@ const toggleMobileMenu = () => {
   }
 }
 </style>
-

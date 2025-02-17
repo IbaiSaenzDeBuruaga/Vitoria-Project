@@ -1,48 +1,35 @@
+//loginOptions.vue
 <template>
-  <div class="login-page">
+  <div class="login-page" v-show="!showTMC">
     <div class="login-container">
-      <h1>Tramitación online</h1>
-      
-      <!-- TMC Section -->
-      <section class="login-option">
-        <h2>Tarjeta Municipal Ciudadana (TMC)</h2>
-        <p>Para trámites online que <strong>NO requieren firma digital</strong>, identifíquese con su Tarjeta Municipal Ciudadana.</p>
-        <div class="option-content">
-          <div class="tmc-card">
-            <img src="../assets/images/tarjeta.png" alt="Tarjeta Municipal" />
-          </div>
-          <button class="identify-button tmc" @click="goToTMCLogin">
-            Identificarse con TMC
+        <h1>Inscripción en Actividades</h1>
+        <section class="message-section">
+          <p>Para inscribirte en una actividad, necesitas estar conectado.</p>
+          <p>Por favor, inicia sesión para continuar.</p>
+        </section>
+        <section class="login-option">
+          <button class="login-button" @click="showLoginComponent">
+            Iniciar Sesión
           </button>
-        </div>
-      </section>
-
-      <!-- Additional Information -->
-      <section class="additional-info">
-        <h2>Información adicional</h2>
-        <ul>
-          <li><a href="#" class="info-link">Medios de identificación</a></li>
-          <li><a href="#" class="info-link">Ayuda y preguntas frecuentes</a></li>
-        </ul>
-        <p class="company-note">Las empresas deben utilizar un certificado de entidad.</p>
-      </section>
+        </section>
     </div>
   </div>
+    <LoginTMC v-if="showTMC" @close-tmc="showTMC = false" />
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { defineEmits } from 'vue'
+import { ref } from 'vue';
+import LoginTMC from './LoginTMC.vue';
 
-const router = useRouter()
-const emit = defineEmits(['tmc-selected'])
+const showTMC = ref(false);
 
-const goToTMCLogin = () => {
-  emit('tmc-selected')
-}
+const showLoginComponent = () => {
+  showTMC.value = true;
+};
 </script>
 
 <style scoped>
+/* (Same styles as before - no changes needed) */
 .login-page {
   min-height: 100vh;
   background-color: #f0f4f8;
@@ -59,53 +46,27 @@ const goToTMCLogin = () => {
   border-radius: 12px;
   padding: 3rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: center; /* Center all content */
 }
 
 h1 {
   color: #006758;
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  text-align: center;
 }
 
-.login-option {
+.message-section {
   margin-bottom: 2rem;
 }
 
-h2 {
-  color: #2d3748;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-p {
+.message-section p {
   color: #4a5568;
-  margin-bottom: 1.5rem;
   line-height: 1.6;
+  margin-bottom: 0.75rem;
 }
 
-.option-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-}
 
-.tmc-card {
-  width: 100%;
-  max-width: 320px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.tmc-card img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.identify-button {
+.login-button {
   padding: 1rem 2rem;
   border-radius: 4px;
   font-size: 1rem;
@@ -114,51 +75,15 @@ p {
   transition: all 0.3s ease;
   width: 100%;
   max-width: 300px;
-}
-
-.identify-button.tmc {
-  background-color: #e09915;
+  background-color: #006758;
   color: white;
   border: none;
 }
 
-.identify-button.tmc:hover {
-  background-color: #dd94e4;
+.login-button:hover {
+  background-color: #005447;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 103, 88, 0.2);
-}
-
-.additional-info {
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.info-link {
-  color: #006758;
-  text-decoration: none;
-  display: inline-block;
-  margin-bottom: 0.75rem;
-  transition: color 0.2s ease;
-}
-
-.info-link:hover {
-  color: #005447;
-  text-decoration: underline;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 1.5rem;
-}
-
-.company-note {
-  color: #718096;
-  font-style: italic;
-  font-size: 0.9rem;
-  text-align: center;
-  margin-top: 1.5rem;
 }
 
 @media (max-width: 640px) {
