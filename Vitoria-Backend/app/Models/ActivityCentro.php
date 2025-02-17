@@ -21,14 +21,19 @@ class ActivityCentro extends Model
         'dias'
     ];
 
-    public function activity(){
+    public function activity()
+    {
         return $this->belongsTo(Activity::class);
     }
-    public function centro(){
-        return $this->belongsTo(CentroCivico::class,'id_centro','id');
+
+    public function centroCivico()
+    {
+        return $this->belongsTo(CentroCivico::class);
     }
-    public function activitiesUsers(){
-        return $this->hasMany(ActivityUser::class);
+
+    public function users()
+    {
+        return $this->hasMany(ActivityUser::class, 'activity_id');
     }
 
 

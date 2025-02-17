@@ -1,8 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_AUTH_URL; // Make sure this is defined in .env
+const API_URL = import.meta.env.VITE_API_AUTH_URL; // Asegúrate de que esta URL esté definida en tu .env
 
 export const useActivityStore = defineStore('activity', () => {
     const activities = ref([]);
@@ -16,17 +16,16 @@ export const useActivityStore = defineStore('activity', () => {
         try {
             const response = await axios.get(`${API_URL}/activity/all`);
 
-            // Assuming your API response structure is like this:
-            // { message: "...", ActividadesCentro: [...], Actividades: [...] }
+            // Asumiendo que la respuesta es un objeto con una clave 'ActividadesCentro' que contiene un array de actividades
             const actividadesCentro = response.data.ActividadesCentro;
-            const actividades = response.data.Actividades;
 
-            // Combine the data and format it for ActivityCard
+            // Formatea la data para ActivityCard
             activities.value = actividadesCentro.map(centro => {
-                const actividad = actividades.find(act => act.id === centro.activity_id);
+                const actividad = centro.activity;
+
                 return {
-                    id: centro.id, // Or actividad.id, depending on which ID you need
-                    nombre: actividad?.nombre || 'Nombre no disponible', // Use optional chaining
+                    id: centro.id,
+                    nombre: actividad?.nombre || 'Nombre no disponible',
                     imagen: actividad?.imagen || null,
                     dates: `${centro.fecha_inicio} - ${centro.fecha_fin}`,
                     schedule: `${centro.hora_inicio} - ${centro.hora_fin}`,
