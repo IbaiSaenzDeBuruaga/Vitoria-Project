@@ -73,7 +73,7 @@
             Filtros
           </button>
           <div class="results-count">
-            {{ activityStore.activities.length }} actividades disponibles
+            {{ totalActivities }} actividades disponibles
           </div>
           <div class="sort-dropdown">
             <select>
@@ -86,7 +86,7 @@
 
         <div class="activities-grid">
           <activity-card
-            v-for="activity in activityStore.activities"
+            v-for="activity in paginatedActivities"
             :key="activity.id"
             :nombre="activity.nombre"
             :imagen="activity.imagen"
@@ -101,9 +101,10 @@
 
         <div class="pagination">
           <button
-            v-for="page in 5"
+            v-for="page in totalPages"
             :key="page"
-            :class="['page-button', { active: page === 1 }]"
+            :class="['page-button', { active: currentPage === page }]"
+            @click="goToPage(page)"
           >
             {{ page }}
           </button>
@@ -223,6 +224,23 @@ const handleRegister = async (activityId) => {
     console.error('Registration failed:', error);
     // Handle error, e.g., show an error message
   }
+};
+
+// Pagination variables
+
+const currentPage = ref(1);
+const perPage = ref(6);  // Set a default value
+const totalPages = computed(() => Math.ceil(activityStore.activities.length / perPage.value)); // Initialize
+const totalActivities = computed(() => activityStore.activities.length);
+
+const paginatedActivities = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  const end = start + perPage.value;
+  return activityStore.activities.slice(start, end);
+});
+
+const goToPage = (page) => {
+    currentPage.value = page;
 };
 
 onMounted(() => {
