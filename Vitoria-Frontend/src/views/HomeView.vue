@@ -19,10 +19,10 @@
         <div class="filters-section">
           <h3>Centro cívico</h3>
           <div class="filter-options">
-            <label class="filter-option">
+            <label class="filter-option" v-for="centro in centros" :key="centro.id">
               <input type="checkbox" />
-              <span>Iparralde</span>
-              <span class="count">(24)</span>
+              <span>{{ centro.nombre }}</span>
+              <span class="count">({{ countActividades(centro.id) }})</span>
             </label>
             <!-- Más opciones aquí -->
           </div>
@@ -32,10 +32,23 @@
           <h3>Edad</h3>
           <div class="filter-options">
             <label class="filter-option">
-              <input type="checkbox" />
+              <input type="checkbox" value="1" v-model="selectedEdad"/>
               <span>Adultos</span>
               <span class="count">(156)</span>
             </label>
+            
+            <label class="filter-option">
+              <input type="checkbox" value="2" v-model="selectedEdad"/>
+              <span>Adultos</span>
+              <span class="count">(156)</span>
+            </label>
+
+            <label class="filter-option">
+              <input type="checkbox" value="3" v-model="selectedEdad"/>
+              <span>Adultos</span>
+              <span class="count">(156)</span>
+            </label>
+
             <!-- Más opciones aquí -->
           </div>
         </div>
@@ -44,10 +57,23 @@
           <h3>Idioma</h3>
           <div class="filter-options">
             <label class="filter-option">
-              <input type="checkbox" />
+              <input type="checkbox" value="es" v-model="selectedIdioma"/>
               <span>Castellano</span>
               <span class="count">(89)</span>
             </label>
+            
+            <label class="filter-option">
+              <input type="checkbox" value="en" v-model="selectedIdioma"/>
+              <span>Ingles</span>
+              <span class="count">(89)</span>
+            </label>
+            
+            <label class="filter-option">
+              <input type="checkbox" value="eu" v-model="selectedIdioma"/>
+              <span>Euskera</span>
+              <span class="count">(89)</span>
+            </label>
+
             <!-- Más opciones aquí -->
           </div>
         </div>
@@ -56,13 +82,26 @@
           <h3>Horario</h3>
           <div class="filter-options">
             <label class="filter-option">
-              <input type="checkbox" />
+              <input type="checkbox" value="matutino" v-model="selectedHorario"/>
               <span>Mañana</span>
+              <span class="count">(45)</span>
+            </label>
+
+            <label class="filter-option">
+              <input type="checkbox" value="vespertino" v-model="selectedHorario"/>
+              <span>Tarde</span>
               <span class="count">(45)</span>
             </label>
             <!-- Más opciones aquí -->
           </div>
         </div>
+
+        <button @click="aplicarFiltros">Aplicar Filtros</button>
+
+        <p>Centros: {{ selectedCentro }}</p>
+        <p>Edad: {{ selectedEdad }}</p>
+        <p>Idioma: {{ selectedIdioma }}</p>
+        <p>Horario: {{ selectedHorario }}</p>
       </aside>
 
       <!-- Main Content -->
@@ -130,13 +169,33 @@ import axios from 'axios'
 import { useRouter } from 'vue-router';
 import MisActividades from '../components/MisActividades.vue';
 
+import { useActivityFiltroStore } from '@/stores/activity';
+import { useCentrosStore } from '@/stores/centros'
+
 const activityStore = useActivityStore()
+const activityFiltrosStore = useActivityFiltroStore();
+const centrosStore = useCentrosStore();
+
 const filtersOpen = ref(false)
 const isMobile = computed(() => window.innerWidth < 768)
 const showLogin = ref(false)
 const showTMC = ref(false)
 const authStore = useAuthStore()
 const router = useRouter();
+
+const selectedCentro = ref([]);
+const selectedEdad = ref([]);
+const selectedIdioma = ref([]);
+const selectedHorario = ref([]);
+
+const centros = ref([]);
+const activityFiltros = ref([]);
+
+function aplicarFiltros(){
+  activityFiltrosStore.fetchActivitiesCentro(selectedCentro.value, selectedEdad.value, selectedIdioma.value, selectedHorario.value);
+
+}
+
 
 const showMyActivitiesComponent = ref(false);
 
@@ -245,14 +304,27 @@ const goToPage = (page) => {
 
 onMounted(() => {
   console.log('ActivitiesPortal mounted');
+  centrosStore.fetchAllCentros();
+  console.log("kk"+centrosStore.allCentros);
+  centros.value = centrosStore.allCentros;
+
   activityStore.getActivities();
   validateTokenOnLoad();
+
+  activityFiltrosStore.fetchActivitiesCentro();
+  
+  console.log('Centros HOME:', centros.value);
 
   // Start tracking activity for idle logout
   window.addEventListener('mousemove', resetIdleTimeout);
   window.addEventListener('keypress', resetIdleTimeout);
   resetIdleTimeout(); // Initial call to set the timeout
 });
+
+function countActividades(centro_id){
+  console.log('Centro ID:', centro_id);
+  return activityFiltrosStore.getCountActividades(centro_id);
+}
 </script>
 
 <style scoped>
