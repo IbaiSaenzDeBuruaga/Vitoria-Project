@@ -117,13 +117,13 @@ p {
 }
 
 .identify-button.tmc {
-  background-color: #006758;
+  background-color: #e09915;
   color: white;
   border: none;
 }
 
 .identify-button.tmc:hover {
-  background-color: #005447;
+  background-color: #dd94e4;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 103, 88, 0.2);
 }
