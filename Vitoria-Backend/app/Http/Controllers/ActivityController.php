@@ -15,12 +15,13 @@ class ActivityController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function all()
+    public function all(Request $request)
     {
         try {
-            // Authorization check
-            $activities = Activity::all();
-            return response()->json(['data' => $activities], Response::HTTP_OK);
+            $perPage = $request->input('per_page', 10); 
+            $activities = Activity::paginate($perPage);
+
+            return response()->json($activities, Response::HTTP_OK);  
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to retrieve activities', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

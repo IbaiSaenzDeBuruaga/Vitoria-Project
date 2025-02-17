@@ -9,8 +9,8 @@ class ActivityUser extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'id_user',
-        'id_activity'
+        'user_id',
+        'activity_id'
     ];
 
 
