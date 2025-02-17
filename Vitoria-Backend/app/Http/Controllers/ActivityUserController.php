@@ -30,6 +30,8 @@ class ActivityUserController extends Controller
         }
 
         try{
+
+
             $activityuser = new ActivityUser();
             $activityuser->user_id = auth()->user()->id;
             $activityuser->activity_id = $request->input('activity_id');
@@ -45,7 +47,7 @@ class ActivityUserController extends Controller
         try{
             $user = auth()->user();
             $activitiesUser = ActivityUser::where('user_id', $user->id)
-            ->with('activity.activity')
+            ->with('activityCentro.activity')
             ->get();
             if($activitiesUser){
                 return response()->json(['message' => 'Actividades del usuario', 'data' => $activitiesUser], Response::HTTP_OK);
