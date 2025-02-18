@@ -1,8 +1,7 @@
-//navbar
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <!-- Logo -->
+      <!-- Logo alineado a la izquierda -->
       <div class="logo-section" @click="emit('go-home')">
         <img
           src="../assets/images/logo.png"
@@ -15,21 +14,17 @@
         </div>
       </div>
 
-      <!-- Navigation Links -->
-      <div class="nav-links">
+      <!-- Navigation Links alineados a la derecha -->
+      <div class="nav-actions">
         <a href="#" class="nav-link" @click.prevent="emit('go-home')">Actividades</a>
-        <a href="#" class="nav-link">Centros</a>
-        <a href="#" class="nav-link">Ayuda</a>
         <a
           v-if="authStore.isLoggedIn"
           @click="emit('show-my-activities')"
           class="nav-link"
           >Mis Actividades</a
         >
-      </div>
 
-      <!-- Auth Button -->
-      <div class="auth-buttons">
+        <!-- Botones de autenticación -->
         <button
           v-if="!authStore.isLoggedIn"
           class="login-button"
@@ -58,7 +53,7 @@ import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
 const mobileMenuOpen = ref(false)
-const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']); // Added 'show-login-tmc'
+const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']);
 
 const authStore = useAuthStore()
 
@@ -68,7 +63,6 @@ const toggleMobileMenu = () => {
 </script>
 
 <style scoped>
-/* (The styles remain the same) */
 .navbar {
   height: 72px;
   background: white;
@@ -107,12 +101,9 @@ const toggleMobileMenu = () => {
   white-space: nowrap;
 }
 
-.logo-text .bold {
-  font-weight: 700;
-}
-
-.nav-links {
+.nav-actions {
   display: flex;
+  align-items: center;
   gap: 2rem;
 }
 
@@ -126,11 +117,6 @@ const toggleMobileMenu = () => {
 
 .nav-link:hover {
   color: #006758;
-}
-
-.auth-buttons {
-  display: flex;
-  align-items: center;
 }
 
 .login-button {
@@ -163,7 +149,7 @@ const toggleMobileMenu = () => {
 }
 
 @media (max-width: 1024px) {
-  .nav-links {
+  .nav-actions {
     display: none;
   }
 

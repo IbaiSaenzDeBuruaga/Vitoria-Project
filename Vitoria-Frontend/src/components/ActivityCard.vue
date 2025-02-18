@@ -1,15 +1,22 @@
-//activityCard.vue
 <template>
   <div class="activity-card">
     <div class="activity-image">
-      <img :src="imagen || '/placeholder.svg'" :alt="nombre" />
+      <img :src="imageUrl" :alt="nombre" />
     </div>
     <div class="activity-info">
       <h3>{{ nombre }}</h3>
-      <p><calendar-icon /> {{ dates }}</p>
-      <p><clock-icon /> {{ schedule }}</p>
-      <p><calendar-days-icon /> {{ days }}</p>
-      <button class="register-button" @click="handleRegister">
+      <p>
+        <calendar-icon /> {{ dates }}
+      </p>
+      <p>
+        <clock-icon /> {{ schedule }}
+      </p>
+      <p>
+        <calendar-days-icon /> {{ formattedDays }}
+      </p>
+
+      <button v-if="isRegistered" class="register-button registered">Ya estás inscrito</button>
+      <button v-else class="register-button" @click="handleRegister">
         Inscribirse
         <chevron-right-icon />
       </button>
@@ -18,20 +25,52 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon, CalendarIcon, ClockIcon, CalendarDaysIcon } from 'lucide-vue-next'
+import { ChevronRightIcon, CalendarIcon, ClockIcon, CalendarDaysIcon } from 'lucide-vue-next';
 import { useAuthStore } from '../stores/authStore';
+import { computed, ref, onMounted, watch } from 'vue'; // Importa onMounted y watch
+import { useActivityFiltroStore } from '../stores/activityFiltroStore'; // Importa el store
 
 const props = defineProps({
   nombre: String,
   imagen: String,
   dates: String,
   schedule: String,
-  days: String,
-  id: Number
+  days: {
+    type: Array,
+    required: true,
+  },
+  id: Number,
+  // Ya no necesitas userActivities como prop
 });
 
 const emit = defineEmits(['register', 'show-login']);
 const authStore = useAuthStore();
+const activityStore = useActivityFiltroStore(); // Usa el store
+
+// Usa una variable reactiva para isRegistered
+const isRegistered = ref(false);
+
+// Usa onMounted para verificar la inscripción *inicialmente*
+onMounted(async () => {
+  if (authStore.isLoggedIn) {
+     isRegistered.value = await activityStore.isActivityRegistered(props.id);
+    console.log(isRegistered.value)
+  }
+});
+
+//Usa watch para que al cambiar el login, tambien se actualice el isRegistered
+watch(
+  () => authStore.isLoggedIn, // Observa el estado de autenticación
+  async (newIsLoggedIn) => {
+    if (newIsLoggedIn) {
+      // Si el usuario inicia sesión, verifica la inscripción
+      isRegistered.value = await activityStore.isActivityRegistered(props.id);
+    } else {
+      // Si el usuario cierra sesión, establece isRegistered en false
+      isRegistered.value = false;
+    }
+  }
+);
 
 const handleRegister = () => {
   if (authStore.isLoggedIn) {
@@ -40,8 +79,17 @@ const handleRegister = () => {
     emit('show-login');
   }
 };
-</script>
 
+const VITE_IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
+
+const imageUrl = computed(() => {
+  return props.imagen ? `${VITE_IMAGE_URL}${props.imagen}` : '/placeholder.svg';
+});
+
+const formattedDays = computed(() => {
+  return props.days.join(', ');
+});
+</script>
 
 <style scoped>
 .activity-card {
@@ -108,5 +156,20 @@ const handleRegister = () => {
 
 .register-button:hover {
   background-color: #005647;
+}
+
+/*  Estilos para el botón de "Ya estás inscrito" */
+.register-button.registered {
+  background-color: #d1d5db;
+  /* Gris claro */
+  color: #374151;
+  /* Texto más oscuro */
+  cursor: default;
+  /*  Quitar el cursor de "mano" */
+}
+
+.register-button.registered:hover {
+  background-color: #d1d5db;
+  /*  Mantener el color en hover */
 }
 </style>
