@@ -33,6 +33,8 @@
         <form @submit.prevent="submitAddCentro">
           <label for="nombre">Nombre:</label>
           <input type="text" id="nombre" v-model="newCentro.nombre" required>
+          <label for="direccion">Dirección:</label>
+          <input type="text" id="direccion" v-model="newCentro.direccion" required>
 
           <button type="submit" class="modal-button">Guardar</button>
           <button type="button" class="modal-button" @click="closeAddModal">Cancelar</button>
@@ -46,6 +48,8 @@
         <form @submit.prevent="submitEditCentro">
           <label for="nombre">Nombre:</label>
           <input type="text" id="nombre" v-model="editCentroData.nombre" required>
+          <label for="direccion">Dirección:</label>
+          <input type="text" id="direccion" v-model="editCentroData.direccion" required>
 
           <button type="submit" class="modal-button">Guardar</button>
           <button type="button" class="modal-button" @click="closeEditModal">Cancelar</button>
@@ -68,11 +72,13 @@ const showEditModal = ref(false);
 
 const newCentro = ref({
   nombre: '',
+  direccion:""
 });
 
 const editCentroData = ref({
     id: null,
     nombre: '',
+    direccion: ''
 });
 
 onMounted(async () => {

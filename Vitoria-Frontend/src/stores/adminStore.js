@@ -25,6 +25,8 @@ export const useAdminStore = defineStore('admin', {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
+        console.log("Los datos son los siguientes "+ data);
+
         const response = await axios({
           method,
           url: `${API_URL}${endpoint}`,
@@ -51,7 +53,8 @@ export const useAdminStore = defineStore('admin', {
     async fetchCentros() {
       try {
         const responseData = await this.apiRequest('get', '/centros-civicos/all');
-        this.centros = responseData.data.data.data;
+        console.log("Los centros all son "+ responseData.data.data);
+        this.centros = responseData.data.data;
       } catch (error) { /* Los errores se manejan en apiRequest */ }
     },
     async addCentro(centro) {
@@ -93,6 +96,7 @@ export const useAdminStore = defineStore('admin', {
     async editUsuario(usuario) {
       try {
         const responseData = await this.apiRequest('put', `/usuario/${usuario.id}/update`, usuario);
+        console.log("LA respuesta de edit user es "+JSON.stringify(responseData));
         const index = this.usuarios.findIndex(u => u.id === usuario.id);
         if (index !== -1) {
           this.usuarios[index] = responseData.data.data;

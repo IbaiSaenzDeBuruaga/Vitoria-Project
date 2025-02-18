@@ -43,8 +43,7 @@ class UserController extends Controller
             'name' => 'sometimes|string|max:255',  // 'sometimes' means only validate if present
             'primer_apellido' => 'sometimes|string|max:255',
             'segundo_apellido' => 'nullable|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id, // Exclude current user from unique check
-            'password' => 'sometimes|string|min:8',
+            'email' => 'sometimes|string|email|max:255,' . $user->id, // Exclude current user from unique check
             'n_tarjeta' => 'sometimes|integer',
             'n_barcos' => 'sometimes|integer',
             'rol' => 'nullable|in:admin,usuario',
@@ -55,15 +54,8 @@ class UserController extends Controller
         }
 
         try {
-            // Authorization check (e.g., can('update', $user))
 
-            $user->fill($request->except('password')); // Fill all except password
-
-            if ($request->filled('password')) {  // Only update password if provided
-                $user->password = Hash::make($request->password);
-            }
-
-            $user->save();
+            $user->update($request->all());
 
             return response()->json(['data' => $user, 'message' => 'User updated successfully'], Response::HTTP_OK);
         } catch (\Exception $e) {

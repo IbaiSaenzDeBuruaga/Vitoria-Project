@@ -53,7 +53,7 @@
             <label for="rol">Rol:</label>
             <select id="rol" v-model="newUsuario.rol" required>
               <option value="usuario">Usuario</option>
-              <option value="administrador">Administrador</option>
+              <option value="admin">Administrador</option>
             </select>
 
             <label for="n_tarjeta">Número de Tarjeta (opcional):</label>
@@ -87,7 +87,7 @@
             <label for="edit-rol">Rol:</label>
             <select id="edit-rol" v-model="editUsuarioData.rol" required>
               <option value="usuario">Usuario</option>
-              <option value="administrador">Administrador</option>
+              <option value="admin">Administrador</option>
             </select>
 
               <label for="edit-n_tarjeta">Número de Tarjeta (opcional):</label>
@@ -106,7 +106,7 @@
 
 <script setup>
 import BaseCrud from './BaseCrud.vue';
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, toRaw } from 'vue';
 import { useAdminStore } from '@/stores/adminStore'; // Importa el store
 import axios from 'axios';
 
@@ -182,9 +182,8 @@ const closeAddModal = () => {
 };
 
 const editUsuario = (usuario) => {
-    // Copia los datos del usuario al objeto editUsuarioData. Usamos structuredClone para una copia profunda.
-    editUsuarioData.value = structuredClone(usuario);
-    showEditModal.value = true; // Muestra el modal de edición
+  editUsuarioData.value = structuredClone(toRaw(usuario)); // Primero toRaw, luego structuredClone
+  showEditModal.value = true;
 };
 
 const submitEditUsuario = async () => {
