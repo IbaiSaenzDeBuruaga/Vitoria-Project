@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
 import AdminView from '@/views/AdminView.vue';
-//import comprobarToken from './authManager';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
@@ -15,9 +13,8 @@ const routes = [
   {
     path: '/admin',
     component: AdminView,
-    meta: { serAdmin: true},
-  }
-  
+    meta: { serAdmin: true },
+  },
 ];
 
 const router = createRouter({
@@ -25,17 +22,8 @@ const router = createRouter({
   routes,
 });
 
-const rutasAdmin = [
-  '/admin',
-];
-
-const rutasGenericas = [
-  '/home'
-];
-
-
 const comprobarToken = async () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
   if (token) {
     try {
       const response = await axios.get(urlBack + '/auth/validate-token', {
@@ -43,47 +31,43 @@ const comprobarToken = async () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('Token válido:', response.data.data.rol);
-      return{
+      console.log('Token válido:', response.data); // Inspecciona la respuesta completa
+      return {
         isValid: true,
         rol: response.data.data.rol,
-      } 
-    }
-    catch (error) {
+      };
+    } catch (error) {
       console.error('Error al validar el token:', error);
       return {
         isValid: false,
         rol: false,
       };
     }
-  }
-  else {
-    return{
+  } else {
+    return {
       isValid: false,
       rol: false,
     };
   }
-ç
 };
-
 
 // Añade un guard de navegación global
 router.beforeEach(async (to, from, next) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('authToken');
+  console.log('Ruta actual:', to.path); // Depuración: Imprime la ruta actual
   if (to.matched.some(record => record.meta.serAdmin)) {
+    console.log('Ruta protegida detectada más el token'+ token); // Depuración: Indica que la ruta está protegida
     if (token) {
+      console.log('El token ha sido detectado ');
       try {
         const { isValid, rol } = await comprobarToken();
         // Si la validación es exitosa, permite el acceso
-        const permisoAdmin = rutasAdmin.includes(to.path);
-
-        if (permisoAdmin && rol !== 'admin') {
+        if (rol !== 'admin') {
           alert('No tienes permisos para acceder a esta página');
           next('/');
         } else {
           next();
         }
-
       } catch (error) {
         console.error('Error al validar el token:', error);
         // Si hay un error en la validación, redirige al login
