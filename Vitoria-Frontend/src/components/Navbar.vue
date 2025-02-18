@@ -22,6 +22,7 @@
       <!-- Navigation Links and Auth Buttons (Conditional Rendering) -->
       <div class="nav-actions" :class="{ 'mobile-menu-open': mobileMenuOpen }">
         <a href="#" class="nav-link" @click.prevent="emit('go-home')">Actividades</a>
+
         <a
           v-if="authStore.isLoggedIn"
           @click="emit('show-my-activities')"
@@ -42,6 +43,9 @@
           <user-circle-2-icon/>
           Desconectar
         </button>
+        <button class="login-admin" @click="emit('goAdmin')">
+          Administración
+        </button>
       </div>
     </div>
   </nav>
@@ -53,8 +57,10 @@ import { MenuIcon, UserCircle2Icon } from 'lucide-vue-next';
 import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
-const mobileMenuOpen = ref(false);
-const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']);
+
+const mobileMenuOpen = ref(false)
+const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc', 'goAdmin']);
+
 
 const authStore = useAuthStore();
 
@@ -139,6 +145,7 @@ onUnmounted(() => {
 }
 
 .nav-link:hover {
+  cursor: pointer;
   color: #006758;
 }
 
@@ -162,6 +169,27 @@ onUnmounted(() => {
   background: #006758;
   color: white;
 }
+
+.login-admin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  border: 1px solid #006758;
+  border-radius: 4px;
+  background: white;
+  color: red;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-admin:hover {
+  background: red;
+  color: white;
+}
+
 
 .mobile-menu {
   display: none; /* Hidden by default, shown on mobile */

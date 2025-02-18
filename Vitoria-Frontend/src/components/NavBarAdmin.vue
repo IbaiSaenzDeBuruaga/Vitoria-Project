@@ -14,17 +14,18 @@
           class="logo"
         />
         <div class="logo-text">
-          <span class="bold">sede</span>
-          <span>electrónica</span>
+          <span>Sede</span>
+          <span> Electrónica</span>
         </div>
       </div>
 
        <!-- Auth Button and Mobile Menu Items -->
       <div class="auth-buttons" :class="{ 'mobile-menu-open': mobileMenuOpen && isMobile }">
         <!-- Auth Buttons -->
-        <button v-if="authStore.isLoggedIn" class="login-button" @click="logout">
+        <button v-if="authStore.isLoggedIn" class="login-button" @click="goHome">
+
           <user-circle-2-icon />
-          Cerrar sesión
+          Volver
         </button>
         <button v-if="!authStore.isLoggedIn" class="login-button" @click="showLoginOptions">
           <user-circle-2-icon />
@@ -100,6 +101,8 @@ const logout = async () => {
     console.error('Error al cerrar sesión:', error);
   }
 };
+
+
 
 </script>
 
@@ -279,6 +282,12 @@ const logout = async () => {
 
   .logo-text {
     display: none; /* Hide text on smaller screens */
+    font-size: 1.125rem;
+    white-space: nowrap;
+    }
+
+  .logo-text .bold {
+    font-weight: 700;
   }
 
   .search-section {
