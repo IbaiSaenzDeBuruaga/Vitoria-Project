@@ -1,4 +1,3 @@
-//activityCard.vue
 <template>
   <div class="activity-card">
     <div class="activity-image">
@@ -8,7 +7,7 @@
       <h3>{{ nombre }}</h3>
       <p><calendar-icon /> {{ dates }}</p>
       <p><clock-icon /> {{ schedule }}</p>
-      <p><calendar-days-icon /> {{ days }}</p>
+      <p><calendar-days-icon /> {{ formattedDays }}</p>
       <button class="register-button" @click="handleRegister">
         Inscribirse
         <chevron-right-icon />
@@ -27,7 +26,10 @@ const props = defineProps({
   imagen: String,
   dates: String,
   schedule: String,
-  days: String,
+  days: {  // Updated to expect an array
+    type: Array,
+    required: true
+  },
   id: Number
 });
 
@@ -46,6 +48,10 @@ const VITE_IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
 
 const imageUrl = computed(() => {
   return props.imagen ? `${VITE_IMAGE_URL}${props.imagen}` : '/placeholder.svg';
+});
+
+const formattedDays = computed(() => {  // Formats days from array to string
+  return props.days.join(', ');
 });
 
 </script>
