@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -37,16 +38,16 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user = null)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',  // 'sometimes' means only validate if present
+            'name' => 'sometimes|string|max:255',
             'primer_apellido' => 'sometimes|string|max:255',
             'segundo_apellido' => 'nullable|string|max:255',
-            'email' => 'sometimes|string|email|max:255,' . $user->id, // Exclude current user from unique check
-            'n_tarjeta' => 'sometimes|integer',
-            'n_barcos' => 'sometimes|integer',
-            'rol' => 'nullable|in:admin,usuario',
+            'email' => 'sometimes|string|email|max:255',
+            'n_tarjeta' => 'sometimes',  
+            'n_barcos' => 'sometimes',   
+            'rol' => 'nullable|in:usuario,admin',
         ]);
 
         if ($validator->fails()) {
@@ -55,10 +56,39 @@ class UserController extends Controller
 
         try {
 
-            $user->update($request->all());
 
-            return response()->json(['data' => $user, 'message' => 'User updated successfully'], Response::HTTP_OK);
+            if($user != null){
+
+
+                DB::beginTransaction(); // Inicia la transacción
+
+                // Usa $request->only() para mayor seguridad (Mass Assignment Protection)
+                $userData = $request->only([
+                    'name',
+                    'primer_apellido',
+                    'segundo_apellido',
+                    'email',
+                    'n_tarjeta',
+                    'n_barcos',
+                    'rol',
+                ]);
+
+ 
+
+                $user->update($userData); // Actualiza el usuario con los datos permitidos
+
+
+                DB::commit(); // Confirma la transacción
+
+                return response()->json(['data' => $user, 'message' => 'User updated successfully'], Response::HTTP_OK);
+            }
+            else{
+                return response()->json('No se encontró el usuario', Response::HTTP_NOT_FOUND);
+            }
+            
+
         } catch (\Exception $e) {
+            DB::rollBack(); // Revierte la transacción en caso de error
             return response()->json(['message' => 'Failed to update user', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
