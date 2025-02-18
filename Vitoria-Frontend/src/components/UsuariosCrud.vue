@@ -1,6 +1,6 @@
 <template>
   <BaseCrud ref="baseCrudRef" :items="adminStore.usuarios" :perPage="5" @add="addUsuario" @page-changed="handlePageChange">
-    <div class="table-responsive">
+    <div class="table-responsive" v-if="baseCrudRef">
       <table class="table">
         <thead>
           <tr>
@@ -24,7 +24,7 @@
           </tr>
         </tbody>
       </table>
-      <!-- Indicador de carga -->
+       <!-- Indicador de carga -->
         <div v-if="adminStore.loading" class="loading">Cargando...</div>
 
       <!-- Mensaje de error -->
@@ -32,8 +32,8 @@
         Error: {{ adminStore.error.message }}
       </div>
     </div>
+    <div v-else>Cargando...</div>
 
-     <!-- Modal para Añadir Usuario -->
     <div v-if="showAddModal" class="modal-overlay">
         <div class="modal">
           <h2>Añadir Usuario</h2>
@@ -68,7 +68,6 @@
         </div>
     </div>
 
-      <!-- Modal para editar usuario-->
       <div v-if="showEditModal" class="modal-overlay">
         <div class="modal">
           <h2>Editar Usuario</h2>
@@ -112,8 +111,6 @@ import { useAdminStore } from '@/stores/adminStore'; // Importa el store
 import axios from 'axios';
 
 const adminStore = useAdminStore(); // Usa el store
-const API_URL = import.meta.env.VITE_API_AUTH_URL; // O tu variable de entorno
-
 //Estados para mostrar modales
 const showAddModal = ref(false);
 const showEditModal = ref(false);
@@ -140,10 +137,8 @@ const editUsuarioData = ref({
     n_tarjeta: '',
     n_barcos: ''
 });
-
 // Referencia a la instancia de BaseCrud
 const baseCrudRef = ref(null);
-
 onMounted(async () => {
   await adminStore.fetchUsuarios();
 });
@@ -225,16 +220,14 @@ const closeEditModal = () => {
     };
 };
 const deleteUsuario = (usuario) => {
-  if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${usuario.name}"?`)) {
-     adminStore.deleteUsuario(usuario.id)
-        .catch(error => {
-             // Manejar errores aquí si es necesario.  Por ejemplo, mostrar una notificación.
-        });
+ if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${usuario.name}"?`)) {
+    adminStore.deleteUsuario(usuario.id)
+    .catch(error => {
+          // Maneja el error aquí si es necesario
+    });
   }
 };
 const handlePageChange = (newPage) => {
-    // Puedes hacer algo aquí si necesitas recargar datos al cambiar de página
-    // Por ejemplo:  adminStore.fetchUsuarios(newPage);  (si tu API soporta paginación en el backend)
     console.log('Página cambiada a:', newPage);
 };
 </script>
