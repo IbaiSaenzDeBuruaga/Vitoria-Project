@@ -5,6 +5,7 @@
       @show-login-tmc="() => showTMCLogin(false)"
       @go-home="goToHome"
       @logout="logout"
+      @goAdmin="goAdmin" 
       @show-my-activities="showMyActivities"
     />
 
@@ -141,7 +142,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { FilterIcon } from 'lucide-vue-next';
+import { FilterIcon, Route } from 'lucide-vue-next';
 import ActivityCard from '../components/ActivityCard.vue';
 import Navbar from '../components/Navbar.vue';
 import LoginOptions from '../components/LoginOptions.vue';
@@ -242,6 +243,10 @@ const logout = async () => {
   } catch (error) {
     console.error('Logout failed:', error);
   }
+};
+
+const goAdmin = async () => {
+  router.push('/admin');
 };
 
 const validateTokenOnLoad = async () => {

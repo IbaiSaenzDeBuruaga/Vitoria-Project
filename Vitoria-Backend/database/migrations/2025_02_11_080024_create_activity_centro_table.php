@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('activity_centro', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('activity_id')->constrained('activities');
+            $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->foreignId('centro_id')->constrained('centro_civicos');
 
             $table->date('fecha_inicio');

@@ -16,7 +16,7 @@
 
       <!-- Navigation Links alineados a la derecha -->
       <div class="nav-actions">
-        <a href="#" class="nav-link" @click.prevent="emit('go-home')">Actividades</a>
+        <a href="" class="nav-link" @click.prevent="emit('go-home')">Actividades</a>
         <a
           v-if="authStore.isLoggedIn"
           @click="emit('show-my-activities')"
@@ -36,6 +36,9 @@
         <button v-else class="login-button" @click="emit('logout')">
           Desconectar
         </button>
+        <button class="login-admin" @click="emit('goAdmin')">
+          Administración
+        </button>
       </div>
 
       <!-- Mobile Menu Button -->
@@ -53,7 +56,7 @@ import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
 const mobileMenuOpen = ref(false)
-const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']);
+const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc', 'goAdmin']);
 
 const authStore = useAuthStore()
 
@@ -116,6 +119,7 @@ const toggleMobileMenu = () => {
 }
 
 .nav-link:hover {
+  cursor: pointer;
   color: #006758;
 }
 
@@ -138,6 +142,27 @@ const toggleMobileMenu = () => {
   background: #006758;
   color: white;
 }
+
+.login-admin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  border: 1px solid #006758;
+  border-radius: 4px;
+  background: white;
+  color: red;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-admin:hover {
+  background: red;
+  color: white;
+}
+
 
 .mobile-menu {
   display: none;

@@ -131,7 +131,7 @@ export const useAdminStore = defineStore('admin', {
         const responseData = await this.apiRequest('put', `/activity/${actividad.id}/update`, actividad);
         const index = this.actividades.findIndex(a => a.id === actividad.id);
         if (index !== -1) {
-          this.actividades[index] = responseData.data; // Ajusta si la API devuelve la actividad
+          this.actividades[index] = responseData.data;// Ajusta si la API devuelve la actividad
         }
       } catch (error) { /* Los errores se manejan en apiRequest */ }
     },
