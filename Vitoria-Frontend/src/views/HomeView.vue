@@ -1,7 +1,9 @@
+//HomeView.vue
 <template>
   <div class="activities-portal">
     <Navbar
       @show-login="showLoginOptions"
+      @show-login-tmc="() => showTMCLogin(false)"
       @go-home="goToHome"
       @logout="logout"
       @show-my-activities="showMyActivities"
@@ -19,48 +21,44 @@
         <div class="filters-section">
           <h3>Centro cívico</h3>
           <div class="filter-options">
-            <label class="filter-option">
-              <input type="checkbox" />
-              <span>Iparralde</span>
-              <span class="count">(24)</span>
+            <label class="filter-option" v-for="centro in centros" :key="centro.id">
+              <input type="checkbox" :value="centro.id" v-model="selectedCentro" />
+              <span>{{ centro.nombre }}</span>
+              <span class="count">({{ countActividades(centro.id) }})</span>
             </label>
-            <!-- Más opciones aquí -->
           </div>
         </div>
 
         <div class="filters-section">
           <h3>Edad</h3>
           <div class="filter-options">
-            <label class="filter-option">
-              <input type="checkbox" />
-              <span>Adultos</span>
-              <span class="count">(156)</span>
+            <label class="filter-option" v-for="edadRange in edadRanges" :key="edadRange.id">
+              <input type="checkbox" :value="edadRange.id" v-model="selectedEdad" />
+              <span>{{ edadRange.label }}</span>
+              <span class="count">({{ countActivitiesByEdad(edadRange.min, edadRange.max) }})</span>
             </label>
-            <!-- Más opciones aquí -->
           </div>
         </div>
 
         <div class="filters-section">
           <h3>Idioma</h3>
           <div class="filter-options">
-            <label class="filter-option">
-              <input type="checkbox" />
-              <span>Castellano</span>
-              <span class="count">(89)</span>
+            <label class="filter-option" v-for="idioma in idiomas" :key="idioma.value">
+              <input type="checkbox" :value="idioma.value" v-model="selectedIdioma" />
+              <span>{{ idioma.label }}</span>
+              <span class="count">({{ countActivitiesByIdioma(idioma.value) }})</span>
             </label>
-            <!-- Más opciones aquí -->
           </div>
         </div>
 
         <div class="filters-section">
           <h3>Horario</h3>
           <div class="filter-options">
-            <label class="filter-option">
-              <input type="checkbox" />
-              <span>Mañana</span>
-              <span class="count">(45)</span>
+            <label class="filter-option" v-for="horario in horarios" :key="horario.value">
+              <input type="checkbox" :value="horario.value" v-model="selectedHorario" />
+              <span>{{ horario.label }}</span>
+              <span class="count">({{ countActivitiesByHorario(horario.value) }})</span>
             </label>
-            <!-- Más opciones aquí -->
           </div>
         </div>
       </aside>
@@ -76,10 +74,9 @@
             {{ totalActivities }} actividades disponibles
           </div>
           <div class="sort-dropdown">
-            <select>
-              <option>Más relevante</option>
-              <option>Fecha más próxima</option>
-              <option>A-Z</option>
+            <select v-model="sortBy">
+              <option value="date">Fecha más próxima</option>
+              <option value="az">A-Z</option>
             </select>
           </div>
         </div>
@@ -88,14 +85,14 @@
           <activity-card
             v-for="activity in paginatedActivities"
             :key="activity.id"
-            :nombre="activity.nombre"
-            :imagen="activity.imagen"
-            :dates="activity.dates"
-            :schedule="activity.schedule"
-            :days="activity.days"
+            :nombre="activity.activity.nombre"
+            :imagen="activity.activity.imagen"
+            :dates="`${activity.fecha_inicio} - ${activity.fecha_fin}`"
+            :schedule="`${activity.hora_inicio} - ${activity.hora_fin}`"
+            :days="activity.dias"
             :id="activity.id"
             @register="handleRegister"
-            @show-login="showLoginOptions"
+            @show-login="() => showTMCLogin(true)"
           />
         </div>
 
@@ -112,16 +109,15 @@
       </main>
     </div>
 
-    <LoginOptions v-if="showLogin" @tmc-selected="showTMCLogin" />
-    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" />
+    <LoginOptions v-if="showLogin" @tmc-selected="() => showTMCLogin(false)" />
+    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" :from-register="showTMCFromRegister" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { FilterIcon } from 'lucide-vue-next'
 import ActivityCard from '../components/ActivityCard.vue'
-import { useActivityStore } from '../stores/store'
 import Navbar from '../components/Navbar.vue'
 import LoginOptions from '../components/LoginOptions.vue'
 import LoginTMC from '../components/LoginTMC.vue'
@@ -129,14 +125,42 @@ import { useAuthStore } from '../stores/authStore'
 import axios from 'axios'
 import { useRouter } from 'vue-router';
 import MisActividades from '../components/MisActividades.vue';
+import { useCentrosStore } from '@/stores/centros'  // Import CentrosStore
 
-const activityStore = useActivityStore()
+const centrosStore = useCentrosStore();  // Use CentrosStore
+
 const filtersOpen = ref(false)
 const isMobile = computed(() => window.innerWidth < 768)
 const showLogin = ref(false)
 const showTMC = ref(false)
 const authStore = useAuthStore()
 const router = useRouter();
+
+const selectedCentro = ref([]);
+const selectedEdad = ref([]);
+const selectedIdioma = ref([]);
+const selectedHorario = ref([]);
+const sortBy = ref('date'); // 'relevance', 'date', 'az'
+
+const centros = ref([]);
+const allActivities = ref([]); // Store all activities here
+
+const idiomas = [
+  { value: 'es', label: 'Castellano' },
+  { value: 'en', label: 'Inglés' },
+  { value: 'eu', label: 'Euskera' },
+];
+
+const horarios = [
+  { value: 'matutino', label: 'Mañana' },
+  { value: 'vespertino', label: 'Tarde' },
+];
+
+const edadRanges = [
+  { id: 1, label: 'Niños', min: 0, max: 12 },
+  { id: 2, label: 'Jóvenes', min: 13, max: 17 },
+  { id: 3, label: 'Adultos', min: 18, max: 150 }, // Assuming a reasonable max age
+];
 
 const showMyActivitiesComponent = ref(false);
 
@@ -149,24 +173,35 @@ const showLoginOptions = () => {
   showTMC.value = false
 }
 
-const showTMCLogin = () => {
-  showLogin.value = false
-  showTMC.value = true
-}
+const showTMCLogin = (fromRegister = false) => { // Add fromRegister parameter
+  showLogin.value = false;
+  showTMC.value = true;
+  showTMCFromRegister.value = fromRegister; // Set the prop value
+};
 
-const handleLoginSuccess = () => {
-  showLogin.value = false
-  showTMC.value = false
-}
+// Add this ref to manage the fromRegister prop for LoginTMC
+const showTMCFromRegister = ref(false);
+
+
+// MODIFICADO:  Recarga las actividades
+const handleLoginSuccess = async () => {
+  showLogin.value = false;
+  showTMC.value = false;
+  await fetchActivities(); // Recarga las actividades
+  router.push('/'); // Redirige al inicio, *después* de recargar.  Importante!
+
+};
 
 const goToHome = () => {
   showLogin.value = false;
   showTMC.value = false;
   showMyActivitiesComponent.value = false
 }
+
 const showMyActivities = () => {
   showMyActivitiesComponent.value = !showMyActivitiesComponent.value;
 }
+
 const API_URL = import.meta.env.VITE_API_AUTH_URL;
 
 let idleTimeout;
@@ -189,37 +224,34 @@ const logout = async () => {
 };
 
 const validateTokenOnLoad = async () => {
-  console.log('validateTokenOnLoad called');
-  if (authStore.token) {
-    console.log('Token found in authStore:', authStore.token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
-    console.log('Authorization header set:', axios.defaults.headers.common['Authorization']);
-    try {
-      const response = await axios.get(`${API_URL}/auth/validate-token`);
-      console.log('validate-token response:', response);
-      if (response.status !== 200) {
-        authStore.clearToken();
-        delete axios.defaults.headers.common['Authorization'];
-        console.log("token invalid - clearing token");
-      } else {
-        console.log("token is valid - keeping user logged in");
-      }
-    } catch (error) {
-      console.error('Token validation failed:', error);
-      authStore.clearToken();
-      delete axios.defaults.headers.common['Authorization'];
-      console.log("token invalid - clearing token");
+    if (authStore.token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${authStore.token}`;
+        try {
+            const response = await axios.get(`${API_URL}/auth/validate-token`);
+            if (response.status !== 200) {
+                authStore.clearToken();
+                delete axios.defaults.headers.common['Authorization'];
+            }
+        } catch (error) {
+            console.error('Token validation failed:', error);
+            authStore.clearToken();
+            delete axios.defaults.headers.common['Authorization'];
+        }
     }
-  } else {
-    console.log('No token found in authStore');
-  }
 };
 
 const handleRegister = async (activityId) => {
+    if (!authStore.isLoggedIn) {
+      showTMCLogin(true); // Pass 'true' to indicate coming from registration
+      return;
+    }
+
+
   try {
     const response = await axios.post(`${API_URL}/activityUser/add`, { activity_id: activityId });
     console.log('Registration successful:', response.data);
     // Handle success, e.g., show a success message
+      fetchActivities();
   } catch (error) {
     console.error('Registration failed:', error);
     // Handle error, e.g., show an error message
@@ -227,35 +259,128 @@ const handleRegister = async (activityId) => {
 };
 
 // Pagination variables
-
 const currentPage = ref(1);
 const perPage = ref(6);  // Set a default value
-const totalPages = computed(() => Math.ceil(activityStore.activities.length / perPage.value)); // Initialize
-const totalActivities = computed(() => activityStore.activities.length);
+const totalPages = computed(() => Math.ceil(filteredActivities.value.length / perPage.value)); // Initialize
+const totalActivities = computed(() => filteredActivities.value.length);
+
+
+const goToPage = (page) => {
+  currentPage.value = page;
+};
+
+const filteredActivities = computed(() => {
+  let activities = allActivities.value;
+
+  if (selectedCentro.value.length > 0) {
+    activities = activities.filter(activity => selectedCentro.value.includes(activity.centro_id));
+  }
+  if (selectedEdad.value.length > 0) {
+    activities = activities.filter(activity => {
+      return selectedEdad.value.some(edadId => {
+        const range = edadRanges.find(r => r.id === edadId);
+        return activity.activity.edad_min <= range.max && activity.activity.edad_max >= range.min;
+      });
+    });
+  }
+
+  if (selectedIdioma.value.length > 0) {
+    activities = activities.filter(activity => selectedIdioma.value.includes(activity.activity.idioma));
+  }
+  if (selectedHorario.value.length > 0) {
+    activities = activities.filter(activity => selectedHorario.value.includes(activity.activity.horario));
+  }
+
+  // Sorting
+  if (sortBy.value === 'date') {
+    activities.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
+  } else if (sortBy.value === 'az') {
+    activities.sort((a, b) => a.activity.nombre.localeCompare(b.activity.nombre));
+  }
+  // No need for else if 'relevance', as it's the default order
+
+  return activities;
+});
 
 const paginatedActivities = computed(() => {
   const start = (currentPage.value - 1) * perPage.value;
   const end = start + perPage.value;
-  return activityStore.activities.slice(start, end);
+  return filteredActivities.value.slice(start, end);
 });
 
-const goToPage = (page) => {
-    currentPage.value = page;
+// NUEVA FUNCIÓN:  Para recargar las actividades
+const fetchActivities = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/activity/all`);
+    allActivities.value = response.data.ActividadesCentro;
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
 };
 
-onMounted(() => {
-  console.log('ActivitiesPortal mounted');
-  activityStore.getActivities();
-  validateTokenOnLoad();
+
+onMounted(async () => {
+  // Fetch centros
+  await centrosStore.fetchAllCentros();
+  centros.value = centrosStore.allCentros;
+
+  // Fetch all activities  <--  Ahora usamos la función
+  await fetchActivities();
+
+    validateTokenOnLoad();
 
   // Start tracking activity for idle logout
   window.addEventListener('mousemove', resetIdleTimeout);
   window.addEventListener('keypress', resetIdleTimeout);
   resetIdleTimeout(); // Initial call to set the timeout
 });
+
+
+// Count functions (now use allActivities)
+const countActividades = (centroId) => {
+  return allActivities.value.filter(act => act.centro_id === centroId).length;
+};
+
+const countActivitiesByEdad = (min, max) => {
+  return allActivities.value.filter(activity => {
+    return activity.activity.edad_min <= max && activity.activity.edad_max >= min;
+  }).length;
+};
+const countActivitiesByIdioma = (idioma) => {
+  return allActivities.value.filter(activity => activity.activity.idioma === idioma).length;
+};
+
+const countActivitiesByHorario = (horario) => {
+  return allActivities.value.filter(activity => activity.activity.horario === horario).length;
+};
+
+
+function aplicarFiltros() {
+  // The filtering is now handled by the `filteredActivities` computed property
+  currentPage.value = 1; // Reset to the first page
+}
+
+watch(filteredActivities, () => {
+  currentPage.value = 1; // Reset page when filters change
+});
+
 </script>
 
 <style scoped>
+/* No scrollbar on filters-sidebar */
+.filters-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  height: calc(100vh - 72px);
+  position: sticky;
+  top: 72px;
+  /* overflow-y: auto;  <-- REMOVE THIS */
+  border-right: 1px solid #e5e7eb;
+}
+
+
+/* ... (the rest of your existing styles) ... */
 .activities-portal {
   min-height: 100vh;
   background-color: #fff;
@@ -269,16 +394,7 @@ onMounted(() => {
   gap: 2rem;
 }
 
-.filters-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  padding: 1.5rem;
-  height: calc(100vh - 72px);
-  position: sticky;
-  top: 72px;
-  overflow-y: auto;
-  border-right: 1px solid #e5e7eb;
-}
+
 
 .filters-header {
   display: flex;
@@ -332,7 +448,8 @@ onMounted(() => {
 
 .main-content {
   flex: 1;
-  padding: 1.5rem 0;
+  padding: 1.5rem;
+
 }
 
 .content-header {
@@ -415,4 +532,5 @@ onMounted(() => {
   color: white;
   border-color: #006758;
 }
+
 </style>

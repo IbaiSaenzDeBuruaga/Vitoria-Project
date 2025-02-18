@@ -39,6 +39,7 @@ Route::prefix('image')->group(function () {
 Route::prefix('activity')->group(function () {
     Route::get('/all',[ActivityController::class, 'allCentroCivicoActivity']);
     Route::get('/todos', [ActivityController::class, 'todos']);
+    Route::get('/countActivities/{activity}', [ActivityController::class, 'countActivitiesPorCentro']);
     Route::get('{activity}',[ActivityController::class, 'show']);
     Route::middleware('auth:api')->group(function () {
         Route::post('/',[ActivityController::class,'store'])->middleware('admin');

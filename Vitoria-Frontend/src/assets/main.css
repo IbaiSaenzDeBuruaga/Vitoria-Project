@@ -1,1 +1,78 @@
 
+/* main.css (or your main stylesheet) */
+
+@font-face {
+    font-family: 'Helvetica-Bold';
+    src: url('./fonts/Helvetica-Bold.ttf') format('truetype'); /* Adjust path if needed */
+    font-weight: bold;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Helvetica-BoldOblique';
+    src: url('./fonts/Helvetica-BoldOblique.ttf') format('truetype');
+    font-weight: bold;
+    font-style: oblique;
+  }
+  
+  @font-face {
+    font-family: 'Helvetica-compressed'; /* Choose a suitable name */
+    src: url('./fonts/helvetica-compressed-5871d14b6903a.otf') format('opentype');
+    /* You might need to determine font-weight and font-style for compressed fonts */
+  }
+  
+  @font-face {
+      font-family: 'Helvetica-light';
+      src: url('./fonts/helvetica-light-587ebe5a59211.ttf') format('truetype');
+       /* You might need to determine font-weight and font-style for compressed fonts */
+  }
+  
+  
+  @font-face {
+    font-family: 'Helvetica-Oblique';
+    src: url('./fonts/Helvetica-Oblique.ttf') format('truetype');
+    font-weight: normal; /* Or a specific weight if known */
+    font-style: oblique;
+  }
+  
+  @font-face {
+    font-family: 'Helvetica-rounded-bold';
+    src: url('./fonts/helvetica-rounded-bold-5871d05ead8de.otf') format('opentype');
+    /* You might need to determine font-weight and font-style for rounded fonts */
+     font-weight: bold;
+  }
+  
+  @font-face {
+    font-family: 'Helvetica'; /* Regular Helvetica */
+    src: url('./fonts/Helvetica.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  
+  /* Example of how to use the fonts */
+  body {
+    font-family: 'Helvetica', sans-serif; /* Use regular Helvetica as the default */
+  }
+  
+  h1, h2, h3 {
+    font-family: 'Helvetica-Bold', sans-serif; /* Use bold for headings */
+  }
+  
+  .italic-text {
+      font-family: 'Helvetica-Oblique', sans-serif;
+  }
+  
+  .bold-oblique-text {
+    font-family: 'Helvetica-BoldOblique', sans-serif;
+  }
+  
+  .compressed-text{
+      font-family: 'Helvetica-compressed', sans-serif;
+  }
+  .light-text{
+      font-family: 'Helvetica-light', sans-serif;
+  }
+  .rounded-text{
+      font-family: 'Helvetica-rounded-bold', sans-serif;
+  }

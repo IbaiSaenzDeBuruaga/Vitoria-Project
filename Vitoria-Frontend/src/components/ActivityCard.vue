@@ -1,3 +1,4 @@
+//activityCard.vue
 <template>
   <div class="activity-card">
     <div class="activity-image">
