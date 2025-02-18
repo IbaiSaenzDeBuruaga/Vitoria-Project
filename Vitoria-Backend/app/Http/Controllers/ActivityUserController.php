@@ -30,6 +30,8 @@ class ActivityUserController extends Controller
         }
 
         try{
+
+
             $activityuser = new ActivityUser();
             $activityuser->user_id = auth()->user()->id;
             $activityuser->activity_id = $request->input('activity_id');

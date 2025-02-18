@@ -27,6 +27,16 @@ class ActivityController extends Controller
         }
     }
 
+    public function todos(){
+        try {
+            $activities = Activity::all();
+
+            return response()->json($activities, Response::HTTP_OK);  
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to retrieve activities', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

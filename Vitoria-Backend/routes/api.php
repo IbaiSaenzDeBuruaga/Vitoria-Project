@@ -38,6 +38,7 @@ Route::prefix('image')->group(function () {
 
 Route::prefix('activity')->group(function () {
     Route::get('/all',[ActivityController::class, 'allCentroCivicoActivity']);
+    Route::get('/todos', [ActivityController::class, 'todos']);
     Route::get('/countActivities/{activity}', [ActivityController::class, 'countActivitiesPorCentro']);
     Route::get('{activity}',[ActivityController::class, 'show']);
     Route::middleware('auth:api')->group(function () {
@@ -72,7 +73,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::prefix('usuario')->group(function () {
     Route::middleware('auth:api')->group(function () {
-        Route::get('all',[UserController::class, 'all']);
+        Route::get('all',[UserController::class, 'index']);
         Route::get('{usuario}',[UserController::class, 'show'])->middleware('admin');
         Route::put('{usuario}/update',[UserController::class, 'update'])->middleware('admin');
         Route::delete('{usuario}/delete',[UserController::class,'destroy'])->middleware('admin');
