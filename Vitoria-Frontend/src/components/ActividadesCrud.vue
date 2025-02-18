@@ -195,6 +195,7 @@ const submitEditActivity = async () => {
             idioma: null,
             plazas: null 
         }; //Limpia
+        location.reload();
     } catch (error) {
         console.log(error)
     }

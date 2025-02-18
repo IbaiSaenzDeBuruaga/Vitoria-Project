@@ -14,16 +14,16 @@
           class="logo"
         />
         <div class="logo-text">
-          <span class="bold">sede</span>
-          <span>electrónica</span>
+          <span>Sede</span>
+          <span> Electrónica</span>
         </div>
       </div>
 
       <!-- Auth Button -->
       <div class="auth-buttons">
-        <button v-if="authStore.isLoggedIn" class="login-button" @click="logout">
+        <button v-if="authStore.isLoggedIn" class="login-button" @click="goHome">
           <user-circle-2-icon />
-          Cerrar sesión
+          Volver
         </button>
         <button v-if="!authStore.isLoggedIn" class="login-button" >
           <user-circle-2-icon />
@@ -54,18 +54,7 @@ const goHome = () => {
     router.push("/");
 };
 
-const logout = async () => {
-    try {
-      // Limpia el token del localStorage
-      localStorage.removeItem('token');  // OJO: No recomendado localStorage
-      localStorage.removeItem('rol')
-      // Redirige a la página de inicio
-      router.push('/');
-      window.location.reload()
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
-};
+
 
 </script>
 
@@ -118,7 +107,7 @@ const logout = async () => {
   .logo-text {
     font-size: 1.125rem;
     white-space: nowrap;
-  }
+    }
 
   .logo-text .bold {
     font-weight: 700;

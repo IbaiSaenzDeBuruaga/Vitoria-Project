@@ -104,7 +104,7 @@ class ActivityController extends Controller
         try {
             // Authorization check
             $activity->delete();
-            return response()->json(['message' => 'Activity deleted successfully'], Response::HTTP_NO_CONTENT);
+            return response()->json(['message' => 'Activity deleted successfully'], Response::HTTP_ACCEPTED);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to delete activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
