@@ -13,7 +13,7 @@ class ActivityCentro extends Model
 
     protected $fillable = [
         'activity_id',
-        'centro_id',  // Cambiado a 'centro_id'
+        'centro_id',
         'fecha_inicio',
         'fecha_fin',
         'hora_inicio',
@@ -32,7 +32,7 @@ class ActivityCentro extends Model
 
     public function centroCivico()
     {
-        return $this->belongsTo(CentroCivico::class, 'centro_id');  // Cambiado a 'centro_id'
+        return $this->belongsTo(CentroCivico::class, 'centro_id');
     }
 
     public function users()
@@ -47,13 +47,13 @@ class ActivityCentro extends Model
         $activities = Activity::all();
 
         // Datos de ejemplo para la tabla pivote
-        $diasSemana = ['L', 'M', 'x', 'J', 'V', 'S', 'D'];
+        $diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
         foreach ($centrosCivicos as $centro) {
             foreach ($activities->random(rand(1, 5)) as $activity) {
                 ActivityCentro::create([
                     'activity_id' => $activity->id,
-                    'centro_id' => $centro->id,  // Cambiado a 'centro_id'
+                    'centro_id' => $centro->id,
                     'fecha_inicio' => now()->addDays(rand(1, 30)),
                     'fecha_fin' => now()->addMonths(rand(1, 6)),
                     'hora_inicio' => sprintf('%02d:%02d', rand(9, 20), rand(0, 59)),
@@ -62,5 +62,11 @@ class ActivityCentro extends Model
                 ]);
             }
         }
+    }
+
+    // Accessor para formatear los días
+    public function getDiasFormateadosAttribute()
+    {
+        return implode(', ', $this->dias);
     }
 }

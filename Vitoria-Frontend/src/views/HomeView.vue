@@ -18,9 +18,12 @@
           <h2>Filtros</h2>
         </div>
 
-        <div class="filters-section">
-          <h3>Centro cívico</h3>
-          <div class="filter-options">
+        <div class="filters-section" :class="{ 'collapsed': !centrosExpanded }">
+          <div class="filter-section-header" @click="centrosExpanded = !centrosExpanded">
+            <h3>Centro cívico</h3>
+            <span class="collapse-icon">{{ centrosExpanded ? '-' : '+' }}</span>
+          </div>
+          <div class="filter-options" v-if="centrosExpanded">
             <label class="filter-option" v-for="centro in centros" :key="centro.id">
               <input type="checkbox" :value="centro.id" v-model="selectedCentro" />
               <span>{{ centro.nombre }}</span>
@@ -29,9 +32,12 @@
           </div>
         </div>
 
-        <div class="filters-section">
-          <h3>Edad</h3>
-          <div class="filter-options">
+        <div class="filters-section" :class="{ 'collapsed': !edadExpanded }">
+          <div class="filter-section-header" @click="edadExpanded = !edadExpanded">
+            <h3>Edad</h3>
+            <span class="collapse-icon">{{ edadExpanded ? '-' : '+' }}</span>
+          </div>
+          <div class="filter-options" v-if="edadExpanded">
             <label class="filter-option" v-for="edadRange in edadRanges" :key="edadRange.id">
               <input type="checkbox" :value="edadRange.id" v-model="selectedEdad" />
               <span>{{ edadRange.label }}</span>
@@ -40,9 +46,12 @@
           </div>
         </div>
 
-        <div class="filters-section">
-          <h3>Idioma</h3>
-          <div class="filter-options">
+        <div class="filters-section" :class="{ 'collapsed': !idiomaExpanded }">
+          <div class="filter-section-header" @click="idiomaExpanded = !idiomaExpanded">
+            <h3>Idioma</h3>
+            <span class="collapse-icon">{{ idiomaExpanded ? '-' : '+' }}</span>
+          </div>
+          <div class="filter-options" v-if="idiomaExpanded">
             <label class="filter-option" v-for="idioma in idiomas" :key="idioma.value">
               <input type="checkbox" :value="idioma.value" v-model="selectedIdioma" />
               <span>{{ idioma.label }}</span>
@@ -51,9 +60,12 @@
           </div>
         </div>
 
-        <div class="filters-section">
-          <h3>Horario</h3>
-          <div class="filter-options">
+        <div class="filters-section" :class="{ 'collapsed': !horarioExpanded }">
+          <div class="filter-section-header" @click="horarioExpanded = !horarioExpanded">
+            <h3>Horario</h3>
+            <span class="collapse-icon">{{ horarioExpanded ? '-' : '+' }}</span>
+          </div>
+          <div class="filter-options" v-if="horarioExpanded">
             <label class="filter-option" v-for="horario in horarios" :key="horario.value">
               <input type="checkbox" :value="horario.value" v-model="selectedHorario" />
               <span>{{ horario.label }}</span>
@@ -163,6 +175,13 @@ const edadRanges = [
 ];
 
 const showMyActivitiesComponent = ref(false);
+
+// Ref to control filter section expansion
+const centrosExpanded = ref(true);
+const edadExpanded = ref(true);
+const idiomaExpanded = ref(true);
+const horarioExpanded = ref(true);
+
 
 const toggleFilters = () => {
   filtersOpen.value = !filtersOpen.value
@@ -367,6 +386,25 @@ watch(filteredActivities, () => {
 </script>
 
 <style scoped>
+
+/* Style for the minimal scrollbar */
+.filters-sidebar::-webkit-scrollbar {
+  width: 5px; /* Adjust width as needed */
+}
+
+.filters-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the tracking area */
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scroll thumb */
+  border-radius: 2.5px; /* Make the thumb rounded */
+}
+
+.filters-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color when hovered */
+}
+
 /* No scrollbar on filters-sidebar */
 .filters-sidebar {
   width: 280px;
@@ -375,7 +413,7 @@ watch(filteredActivities, () => {
   height: calc(100vh - 72px);
   position: sticky;
   top: 72px;
-  /* overflow-y: auto;  <-- REMOVE THIS */
+  overflow-y: auto;  /* Add this back */
   border-right: 1px solid #e5e7eb;
 }
 
@@ -430,6 +468,8 @@ watch(filteredActivities, () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow: hidden; /* Hide content when collapsed */
+  transition: max-height 0.3s ease;
 }
 
 .filter-option {
@@ -531,6 +571,25 @@ watch(filteredActivities, () => {
   background-color: #006758;
   color: white;
   border-color: #006758;
+}
+
+/* Styles for collapsible sections */
+.filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+
+.collapse-icon {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.collapsed .filter-options {
+  max-height: 0;
+  transition: max-height 0.3s ease;
 }
 
 </style>
