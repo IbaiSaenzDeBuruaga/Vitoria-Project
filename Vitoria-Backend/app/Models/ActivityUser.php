@@ -11,7 +11,7 @@ class ActivityUser extends Model
 
     protected $fillable = [
         'user_id',
-        'centro_id' // Clave foránea correcta para la tabla pivote
+        'activity_id' // Clave foránea correcta para la tabla pivote
     ];
 
     public function user()
@@ -21,7 +21,7 @@ class ActivityUser extends Model
 
     public function activityCentro()
     {
-        return $this->belongsTo(ActivityCentro::class, 'centro_id'); // Usa la clave foránea correcta
+        return $this->belongsTo(ActivityCentro::class, 'activity_id'); // Usa la clave foránea correcta
     }
 
     public static function seedActivityUsers()
