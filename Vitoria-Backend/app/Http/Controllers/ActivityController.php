@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\ActivityCentro;
+use App\Models\ActivityUser; // Importante
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\CentroCivico;
 use Exception;
+use Illuminate\Database\Eloquent\Builder; // Importante
 use Symfony\Component\HttpFoundation\Response;
 
 class ActivityController extends Controller
 {
-    /**
+    // ... (otros métodos: all, todos, store, show, update, destroy, addCentroCivicoToActivity, removeCentroCivicoFromActivity) ...
+     /**
      * Display a listing of the resource.
      */
     public function all(Request $request)
@@ -45,6 +48,11 @@ class ActivityController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'imagen' => 'nullable|string|max:255', // Adjust validation as needed
+             'edad_min' => 'required|integer',
+            'edad_max' => 'required|integer',
+            'horario' => 'required|in:matutino,vespertino',
+            'idioma' => 'required|in:es,en,eu',
+            'plazas' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -81,6 +89,11 @@ class ActivityController extends Controller
         $validator = Validator::make($request->all(), [
             'nombre' => 'sometimes|string|max:255',
             'imagen' => 'nullable|string|max:255', // Adjust validation as needed
+            'edad_min' => 'sometimes|integer',
+            'edad_max' => 'sometimes|integer',
+            'horario' => 'sometimes|in:matutino,vespertino',
+            'idioma' => 'sometimes|in:es,en,eu',
+            'plazas' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -154,15 +167,24 @@ class ActivityController extends Controller
             return response()->json(['message' => 'Failed to remove centro civico from activity', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function allCentroCivicoActivity()
+    {
+        try {
+            $activitiesCentros = ActivityCentro::with('activity')
+                ->whereHas('activity', function (Builder $query) {
+                    $query->where('plazas', '>', 0); // Asegura que la actividad tenga plazas definidas
+                })
+                ->get()
+                ->filter(function ($activityCentro) {
+                    // Calcula las plazas ocupadas
+                    $plazasOcupadas = ActivityUser::where('activity_id', $activityCentro->id)->count();
+                    // Compara con las plazas totales de la actividad
+                    return $activityCentro->activity->plazas > $plazasOcupadas;
+                });
 
-    public function allCentroCivicoActivity(){
-        try{
-            $activitiesCentros = ActivityCentro::with('activity')->get();
-            return response()->json(['message' => 'Solicitud realizada con éxito','ActividadesCentro'=>$activitiesCentros], Response::HTTP_OK);
-
-        }
-        catch(Exception $e){
-            return response()->json(['message' => 'Failed get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Solicitud realizada con éxito', 'ActividadesCentro' => $activitiesCentros], Response::HTTP_OK);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Failed to get activities from centrocivicos', 'error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
