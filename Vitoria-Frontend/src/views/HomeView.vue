@@ -1,4 +1,3 @@
-//HomeView.vue
 <template>
   <div class="activities-portal">
     <Navbar
@@ -14,7 +13,8 @@
     <div v-else-if="!showLogin && !showTMC" class="main-container">
       <!-- Sidebar with Filters -->
       <aside class="filters-sidebar" :class="{ 'show-filters': filtersOpen }">
-        <div class="filters-header">
+          <!-- ... (resto del sidebar) ... -->
+           <div class="filters-header">
           <h2>Filtros</h2>
         </div>
 
@@ -122,40 +122,56 @@
     </div>
 
     <LoginOptions v-if="showLogin" @tmc-selected="() => showTMCLogin(false)" />
-    <LoginTMC v-if="showTMC" @back-to-login="showLoginOptions" @login-success="handleLoginSuccess" :from-register="showTMCFromRegister" />
+    <LoginTMC
+      v-if="showTMC"
+      @back-to-login="showLoginOptions"
+      @login-success="handleLoginSuccess"
+      :from-register="showTMCFromRegister"
+    />
+
+    <!-- Registration Success Popup -->
+    <div v-if="showRegistrationSuccess" class="popup-overlay">
+      <div class="popup-content">
+        <p>¡Te has inscrito correctamente!</p>
+        <button @click="showRegistrationSuccess = false">Cerrar</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import { FilterIcon } from 'lucide-vue-next'
-import ActivityCard from '../components/ActivityCard.vue'
-import Navbar from '../components/Navbar.vue'
-import LoginOptions from '../components/LoginOptions.vue'
-import LoginTMC from '../components/LoginTMC.vue'
-import { useAuthStore } from '../stores/authStore'
-import axios from 'axios'
+import { ref, onMounted, computed, watch } from 'vue';
+import { FilterIcon } from 'lucide-vue-next';
+import ActivityCard from '../components/ActivityCard.vue';
+import Navbar from '../components/Navbar.vue';
+import LoginOptions from '../components/LoginOptions.vue';
+import LoginTMC from '../components/LoginTMC.vue';
+import { useAuthStore } from '../stores/authStore';
+import axios from 'axios';
 import { useRouter } from 'vue-router';
 import MisActividades from '../components/MisActividades.vue';
-import { useCentrosStore } from '@/stores/centros'  // Import CentrosStore
+import { useCentrosStore } from '@/stores/centros';
+import { useActivityFiltroStore } from '../stores/activityFiltroStore'; // Importa el store
 
-const centrosStore = useCentrosStore();  // Use CentrosStore
+const centrosStore = useCentrosStore();
+const activityStore = useActivityFiltroStore(); // Usa el store
 
-const filtersOpen = ref(false)
-const isMobile = computed(() => window.innerWidth < 768)
-const showLogin = ref(false)
-const showTMC = ref(false)
-const authStore = useAuthStore()
+const filtersOpen = ref(false);
+const isMobile = computed(() => window.innerWidth < 768);
+const showLogin = ref(false);
+const showTMC = ref(false);
+const authStore = useAuthStore();
 const router = useRouter();
 
 const selectedCentro = ref([]);
 const selectedEdad = ref([]);
 const selectedIdioma = ref([]);
 const selectedHorario = ref([]);
-const sortBy = ref('date'); // 'relevance', 'date', 'az'
+const sortBy = ref('date');
 
 const centros = ref([]);
-const allActivities = ref([]); // Store all activities here
+//const allActivities = ref([]);  <--  Ya no es necesario aquí
+//const userActivities = ref([]);  <--  Ya no es necesario aquí
 
 const idiomas = [
   { value: 'es', label: 'Castellano' },
@@ -171,60 +187,46 @@ const horarios = [
 const edadRanges = [
   { id: 1, label: 'Niños', min: 0, max: 12 },
   { id: 2, label: 'Jóvenes', min: 13, max: 17 },
-  { id: 3, label: 'Adultos', min: 18, max: 150 }, // Assuming a reasonable max age
+  { id: 3, label: 'Adultos', min: 18, max: 150 },
 ];
 
 const showMyActivitiesComponent = ref(false);
-
-// Ref to control filter section expansion
 const centrosExpanded = ref(true);
 const edadExpanded = ref(true);
 const idiomaExpanded = ref(true);
 const horarioExpanded = ref(true);
-
-
-const toggleFilters = () => {
-  filtersOpen.value = !filtersOpen.value
-}
-
-const showLoginOptions = () => {
-  showLogin.value = true
-  showTMC.value = false
-}
-
-const showTMCLogin = (fromRegister = false) => { // Add fromRegister parameter
-  showLogin.value = false;
-  showTMC.value = true;
-  showTMCFromRegister.value = fromRegister; // Set the prop value
-};
-
-// Add this ref to manage the fromRegister prop for LoginTMC
+const showRegistrationSuccess = ref(false);
 const showTMCFromRegister = ref(false);
 
+const toggleFilters = () => {
+  filtersOpen.value = !filtersOpen.value;
+};
 
-// MODIFICADO:  Recarga las actividades
-const handleLoginSuccess = async () => {
-  showLogin.value = false;
+const showLoginOptions = () => {
+  showLogin.value = true;
   showTMC.value = false;
-  await fetchActivities(); // Recarga las actividades
-  router.push('/'); // Redirige al inicio, *después* de recargar.  Importante!
+};
 
+const showTMCLogin = (fromRegister = false) => {
+  showLogin.value = false;
+  showTMC.value = true;
+  showTMCFromRegister.value = fromRegister;
 };
 
 const goToHome = () => {
   showLogin.value = false;
   showTMC.value = false;
-  showMyActivitiesComponent.value = false
-}
+  showMyActivitiesComponent.value = false;
+};
 
 const showMyActivities = () => {
   showMyActivitiesComponent.value = !showMyActivitiesComponent.value;
-}
+};
 
 const API_URL = import.meta.env.VITE_API_AUTH_URL;
 
 let idleTimeout;
-const idleDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+const idleDuration = 60 * 60 * 1000;
 
 const resetIdleTimeout = () => {
   clearTimeout(idleTimeout);
@@ -236,7 +238,7 @@ const logout = async () => {
     await axios.get(`${API_URL}/auth/logout`);
     authStore.clearToken();
     router.push('/');
-    window.location.reload()
+    window.location.reload();
   } catch (error) {
     console.error('Logout failed:', error);
   }
@@ -260,36 +262,41 @@ const validateTokenOnLoad = async () => {
 };
 
 const handleRegister = async (activityId) => {
-    if (!authStore.isLoggedIn) {
-      showTMCLogin(true); // Pass 'true' to indicate coming from registration
-      return;
-    }
-
+  if (!authStore.isLoggedIn) {
+    showTMCLogin(true);
+    return;
+  }
 
   try {
     const response = await axios.post(`${API_URL}/activityUser/add`, { activity_id: activityId });
     console.log('Registration successful:', response.data);
-    // Handle success, e.g., show a success message
-      fetchActivities();
+    showRegistrationSuccess.value = true;
+    // Ya no necesitas fetchUserActivities aquí.
+    // activityStore.fetchActivitiesAll();  <--  Podrías recargar todas, pero no es estrictamente necesario
   } catch (error) {
     console.error('Registration failed:', error);
-    // Handle error, e.g., show an error message
   }
 };
 
-// Pagination variables
-const currentPage = ref(1);
-const perPage = ref(6);  // Set a default value
-const totalPages = computed(() => Math.ceil(filteredActivities.value.length / perPage.value)); // Initialize
-const totalActivities = computed(() => filteredActivities.value.length);
+const handleLoginSuccess = async () => {
+  showLogin.value = false;
+  showTMC.value = false;
+  // activityStore.fetchActivitiesAll(); <--  Podrías recargar, pero no es estrictamente necesario aquí.
+  router.push('/');
+};
 
+const currentPage = ref(1);
+const perPage = ref(6);
+const totalPages = computed(() => Math.ceil(filteredActivities.value.length / perPage.value));
+const totalActivities = computed(() => filteredActivities.value.length);
 
 const goToPage = (page) => {
   currentPage.value = page;
 };
 
 const filteredActivities = computed(() => {
-  let activities = allActivities.value;
+  // Usa activityStore.allActivities
+  let activities = activityStore.allActivities;
 
   if (selectedCentro.value.length > 0) {
     activities = activities.filter(activity => selectedCentro.value.includes(activity.centro_id));
@@ -310,13 +317,11 @@ const filteredActivities = computed(() => {
     activities = activities.filter(activity => selectedHorario.value.includes(activity.activity.horario));
   }
 
-  // Sorting
   if (sortBy.value === 'date') {
     activities.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
   } else if (sortBy.value === 'az') {
     activities.sort((a, b) => a.activity.nombre.localeCompare(b.activity.nombre));
   }
-  // No need for else if 'relevance', as it's the default order
 
   return activities;
 });
@@ -327,82 +332,77 @@ const paginatedActivities = computed(() => {
   return filteredActivities.value.slice(start, end);
 });
 
-// NUEVA FUNCIÓN:  Para recargar las actividades
-const fetchActivities = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/activity/all`);
-    allActivities.value = response.data.ActividadesCentro;
-  } catch (error) {
-    console.error("Error fetching activities:", error);
-  }
-};
-
+// Ya no necesitas fetchActivities ni fetchUserActivities aquí.
 
 onMounted(async () => {
-  // Fetch centros
   await centrosStore.fetchAllCentros();
   centros.value = centrosStore.allCentros;
+  await activityStore.fetchActivitiesAll(); // Usa el método del store
 
-  // Fetch all activities  <--  Ahora usamos la función
-  await fetchActivities();
+  validateTokenOnLoad();
 
-    validateTokenOnLoad();
-
-  // Start tracking activity for idle logout
   window.addEventListener('mousemove', resetIdleTimeout);
   window.addEventListener('keypress', resetIdleTimeout);
-  resetIdleTimeout(); // Initial call to set the timeout
+  resetIdleTimeout();
 });
 
+watch(filteredActivities, () => {
+  currentPage.value = 1;
+});
 
-// Count functions (now use allActivities)
+// Ya no necesitas el watch de authStore.token
+
 const countActividades = (centroId) => {
-  return allActivities.value.filter(act => act.centro_id === centroId).length;
+    //Usa el state.allActivities del store.
+  return activityStore.allActivities.filter(act => act.centro_id === centroId).length;
 };
 
 const countActivitiesByEdad = (min, max) => {
-  return allActivities.value.filter(activity => {
-    return activity.activity.edad_min <= max && activity.activity.edad_max >= min;
-  }).length;
+    //Usa el state.allActivities del store.
+  return activityStore.allActivities
+    .filter(activity => {
+      return activity.activity.edad_min <= max && activity.activity.edad_max >= min;
+    })
+    .length;
 };
+
 const countActivitiesByIdioma = (idioma) => {
-  return allActivities.value.filter(activity => activity.activity.idioma === idioma).length;
+    //Usa el state.allActivities del store.
+  return activityStore.allActivities.filter(activity => activity.activity.idioma === idioma).length;
 };
 
 const countActivitiesByHorario = (horario) => {
-  return allActivities.value.filter(activity => activity.activity.horario === horario).length;
+    //Usa el state.allActivities del store.
+  return activityStore.allActivities.filter(activity => activity.activity.horario === horario).length;
 };
 
-
 function aplicarFiltros() {
-  // The filtering is now handled by the `filteredActivities` computed property
-  currentPage.value = 1; // Reset to the first page
+  currentPage.value = 1;
 }
-
-watch(filteredActivities, () => {
-  currentPage.value = 1; // Reset page when filters change
-});
-
 </script>
 
 <style scoped>
-
 /* Style for the minimal scrollbar */
 .filters-sidebar::-webkit-scrollbar {
-  width: 5px; /* Adjust width as needed */
+  width: 5px;
+  /* Adjust width as needed */
 }
 
 .filters-sidebar::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Color of the tracking area */
+  background: #f1f1f1;
+  /* Color of the tracking area */
 }
 
 .filters-sidebar::-webkit-scrollbar-thumb {
-  background: #888; /* Color of the scroll thumb */
-  border-radius: 2.5px; /* Make the thumb rounded */
+  background: #888;
+  /* Color of the scroll thumb */
+  border-radius: 2.5px;
+  /* Make the thumb rounded */
 }
 
 .filters-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Color when hovered */
+  background: #555;
+  /* Color when hovered */
 }
 
 /* No scrollbar on filters-sidebar */
@@ -413,7 +413,8 @@ watch(filteredActivities, () => {
   height: calc(100vh - 72px);
   position: sticky;
   top: 72px;
-  overflow-y: auto;  /* Add this back */
+  overflow-y: auto;
+  /* Add this back */
   border-right: 1px solid #e5e7eb;
 }
 
@@ -468,7 +469,8 @@ watch(filteredActivities, () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow: hidden; /* Hide content when collapsed */
+  overflow: hidden;
+  /* Hide content when collapsed */
   transition: max-height 0.3s ease;
 }
 
@@ -525,25 +527,25 @@ watch(filteredActivities, () => {
 
 @media (max-width: 1200px) {
   .activities-grid {
-    grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 767px) {
   .filters-sidebar {
-    position: fixed;
-    left: -100%;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    max-width: 320px;
-    background: white;
-    z-index: 50;
-    transition: left 0.3s ease;
+      position: fixed;
+      left: -100%;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 320px;
+      background: white;
+      z-index: 50;
+      transition: left 0.3s ease;
   }
 
   .show-filters {
-    left: 0;
+      left: 0;
   }
 }
 
@@ -592,4 +594,47 @@ watch(filteredActivities, () => {
   transition: max-height 0.3s ease;
 }
 
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  /* Ensure it's above other content */
+}
+
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.popup-content p {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.popup-content button {
+  background-color: #006758;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.popup-content button:hover {
+  background-color: #004c3f;
+}
 </style>

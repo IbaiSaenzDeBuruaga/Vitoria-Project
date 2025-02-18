@@ -60,6 +60,7 @@ Route::prefix('activityUser')->group(function () {
 
 Route::prefix('activityUser')->group(function () {
         Route::get('/getMy', [ActivityUserController::class, 'tusActividades']);
+        Route::get('/isRegistered/{activityId}', [ActivityUserController::class, 'isRegistered']);
 
 });
 
