@@ -59,9 +59,6 @@ export const useAdminStore = defineStore('admin', {
     },
     async addCentro(centro) {
       try {
-
-        
-
         const responseData = await this.apiRequest('post', '/centros-civicos', centro);
         this.centros.push(responseData.data.data);
       } catch (error) { /* Los errores se manejan en apiRequest */ }
@@ -99,6 +96,7 @@ export const useAdminStore = defineStore('admin', {
     async editUsuario(usuario) {
       try {
         const responseData = await this.apiRequest('put', `/usuario/${usuario.id}/update`, usuario);
+        console.log("LA respuesta de edit user es "+JSON.stringify(responseData));
         const index = this.usuarios.findIndex(u => u.id === usuario.id);
         if (index !== -1) {
           this.usuarios[index] = responseData.data.data;
