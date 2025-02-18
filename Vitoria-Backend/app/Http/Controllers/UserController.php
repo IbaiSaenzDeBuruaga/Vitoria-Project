@@ -38,7 +38,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user = null)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
@@ -57,7 +57,7 @@ class UserController extends Controller
         try {
 
 
-            if($user){
+            if($user != null){
 
 
                 DB::beginTransaction(); // Inicia la transacción
@@ -73,8 +73,7 @@ class UserController extends Controller
                     'rol',
                 ]);
 
-                return response()->json('Mi gente el usuario es '.$userData[0]);
-
+ 
 
                 $user->update($userData); // Actualiza el usuario con los datos permitidos
 

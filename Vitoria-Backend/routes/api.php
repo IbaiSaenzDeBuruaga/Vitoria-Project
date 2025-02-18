@@ -75,9 +75,9 @@ Route::middleware('auth:api')->group(function () {
 Route::prefix('usuario')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::get('all',[UserController::class, 'index']);
-        Route::get('{usuario}',[UserController::class, 'show'])->middleware('admin');
-        Route::put('{usuario}/update',[UserController::class, 'update'])->middleware('admin');
-        Route::delete('{usuario}/delete',[UserController::class,'destroy'])->middleware('admin');
+        Route::get('{user}',[UserController::class, 'show'])->middleware('admin');
+        Route::put('/{user}/update',[UserController::class, 'update'])->middleware('admin');
+        Route::delete('{user}/delete',[UserController::class,'destroy'])->middleware('admin');
         Route::put('reset_password',[UserController::class,'resetPassword']);
     });
 });
