@@ -45,7 +45,7 @@ class Activity extends Model
             ['nombre' => 'Yoga', 'imagen' => '/images/yoga.png', 'plazas' => 20, 'edad_min' => 16, 'edad_max' => 60, 'horario' => 'matutino', 'idioma' => 'es'],
             ['nombre' => 'Zumba', 'imagen' => '/images/zumba.jpg', 'plazas' => 30, 'edad_min' => 14, 'edad_max' => 50, 'horario' => 'vespertino', 'idioma' => 'es'],
             ['nombre' => 'Pilates', 'imagen' => '/images/pilates.png', 'plazas' => 25, 'edad_min' => 16, 'edad_max' => 60, 'horario' => 'matutino', 'idioma' => 'es'],
-            ['['nombre' => 'Danza Moderna', 'imagen' => '/images/danza_moderna.jpg', 'plazas' => 15, 'edad_min' => 8, 'edad_max' => 16, 'horario' => 'vespertino', 'idioma' => 'es'],
+            ['nombre' => 'Danza Moderna', 'imagen' => '/images/danza_moderna.jpg', 'plazas' => 15, 'edad_min' => 8, 'edad_max' => 16, 'horario' => 'vespertino', 'idioma' => 'es'],
             ['nombre' => 'Patinaje', 'imagen' => '/images/patinaje.jpg', 'plazas' => 12, 'edad_min' => 6, 'edad_max' => 12, 'horario' => 'matutino', 'idioma' => 'es'],
             ['nombre' => 'Escalada', 'imagen' => '/images/escalada.jpg', 'plazas' => 8, 'edad_min' => 12, 'edad_max' => 25, 'horario' => 'vespertino', 'idioma' => 'es'],
             ['nombre' => 'Tenis', 'imagen' => '/images/tenis.jpg', 'plazas' => 10, 'edad_min' => 10, 'edad_max' => 20, 'horario' => 'matutino', 'idioma' => 'es'],
