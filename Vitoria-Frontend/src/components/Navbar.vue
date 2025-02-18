@@ -14,8 +14,13 @@
         </div>
       </div>
 
-      <!-- Navigation Links alineados a la derecha -->
-      <div class="nav-actions">
+      <!-- Mobile Menu Button (Always visible on mobile) -->
+      <button class="mobile-menu" @click="toggleMobileMenu">
+        <menu-icon />
+      </button>
+
+      <!-- Navigation Links and Auth Buttons (Conditional Rendering) -->
+      <div class="nav-actions" :class="{ 'mobile-menu-open': mobileMenuOpen }">
         <a href="#" class="nav-link" @click.prevent="emit('go-home')">Actividades</a>
         <a
           v-if="authStore.isLoggedIn"
@@ -34,32 +39,45 @@
           Conectar
         </button>
         <button v-else class="login-button" @click="emit('logout')">
+          <user-circle-2-icon/>
           Desconectar
         </button>
       </div>
-
-      <!-- Mobile Menu Button -->
-      <button class="mobile-menu" @click="toggleMobileMenu">
-        <menu-icon />
-      </button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { MenuIcon, UserCircle2Icon } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted } from 'vue'; // Import onMounted and onUnmounted
+import { MenuIcon, UserCircle2Icon } from 'lucide-vue-next';
 import { defineEmits } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
-const mobileMenuOpen = ref(false)
+const mobileMenuOpen = ref(false);
 const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities', 'show-login-tmc']);
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
 const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value
-}
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+};
+
+// Responsive check
+const isMobile = ref(false);
+
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth < 1024; // Consistent with your media query
+};
+
+onMounted(() => {
+  checkIsMobile();
+  window.addEventListener('resize', checkIsMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIsMobile);
+});
+
 </script>
 
 <style scoped>
@@ -92,8 +110,8 @@ const toggleMobileMenu = () => {
 }
 
 .logo {
-  height: 10%;
-  width: 10%;
+  height: 32px; /*  Fixed height.  Using % for height can be problematic. */
+  width: 32px;  /*  Fixed width */
 }
 
 .logo-text {
@@ -105,6 +123,11 @@ const toggleMobileMenu = () => {
   display: flex;
   align-items: center;
   gap: 2rem;
+  /* Default styles for desktop (hidden on mobile) */
+  position: static; /* Default positioning */
+  background-color: transparent;
+  width: auto;
+  box-shadow: none;
 }
 
 .nav-link {
@@ -132,6 +155,7 @@ const toggleMobileMenu = () => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .login-button:hover {
@@ -140,7 +164,7 @@ const toggleMobileMenu = () => {
 }
 
 .mobile-menu {
-  display: none;
+  display: none; /* Hidden by default, shown on mobile */
   background: none;
   border: none;
   color: #006758;
@@ -148,19 +172,45 @@ const toggleMobileMenu = () => {
   padding: 8px;
 }
 
+/* Mobile Styles */
 @media (max-width: 1024px) {
+   .navbar-container {
+    flex-direction: row; /* Keep as row */
+    align-items: center; /* Vertically center items */
+
+  }
+
   .nav-actions {
-    display: none;
+    display: none; /* Hide by default on mobile */
+    flex-direction: column; /* Stack items vertically */
+    position: absolute; /* Position absolutely */
+    top: 72px;        /* Below the navbar */
+    right: 0;        /* Align to the right */
+    background-color: white; /* Background color */
+    width: auto;       /* Adjust width as needed */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional shadow */
+    z-index: 1001;   /* Ensure it's above other content */
+    padding: 1rem;   /* Add some padding */
+
+  }
+    /* Show nav-actions when mobile menu is open */
+  .mobile-menu-open {
+    display: flex;
   }
 
   .mobile-menu {
-    display: block;
+    display: block; /* Show the mobile menu button */
   }
+   .nav-link, .login-button{
+        width: 100%;
+        justify-content: flex-start;
+        padding: 1rem 0;
+    }
 }
 
 @media (max-width: 768px) {
   .logo-text {
-    display: none;
+    display: none; /*  Hide on very small screens */
   }
 }
 </style>

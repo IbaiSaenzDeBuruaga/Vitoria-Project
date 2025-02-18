@@ -11,10 +11,16 @@
     <MisActividades v-if="showMyActivitiesComponent" />
 
     <div v-else-if="!showLogin && !showTMC" class="main-container">
+      <!-- Botón para mostrar/ocultar filtros en móvil -->
+      <button class="filter-toggle" @click="toggleFilters">
+        <FilterIcon />
+        Filtros
+      </button>
+
       <!-- Sidebar with Filters -->
       <aside class="filters-sidebar" :class="{ 'show-filters': filtersOpen }">
-          <!-- ... (resto del sidebar) ... -->
-           <div class="filters-header">
+        <button class="close-filters" @click="toggleFilters">×</button>
+        <div class="filters-header">
           <h2>Filtros</h2>
         </div>
 
@@ -25,7 +31,7 @@
           </div>
           <div class="filter-options" v-if="centrosExpanded">
             <label class="filter-option" v-for="centro in centros" :key="centro.id">
-              <input type="checkbox" :value="centro.id" v-model="selectedCentro" />
+              <input type="checkbox" :value="centro.id" v-model="selectedCentro" @change="aplicarFiltros"/>
               <span>{{ centro.nombre }}</span>
               <span class="count">({{ countActividades(centro.id) }})</span>
             </label>
@@ -39,7 +45,7 @@
           </div>
           <div class="filter-options" v-if="edadExpanded">
             <label class="filter-option" v-for="edadRange in edadRanges" :key="edadRange.id">
-              <input type="checkbox" :value="edadRange.id" v-model="selectedEdad" />
+              <input type="checkbox" :value="edadRange.id" v-model="selectedEdad" @change="aplicarFiltros"/>
               <span>{{ edadRange.label }}</span>
               <span class="count">({{ countActivitiesByEdad(edadRange.min, edadRange.max) }})</span>
             </label>
@@ -53,7 +59,7 @@
           </div>
           <div class="filter-options" v-if="idiomaExpanded">
             <label class="filter-option" v-for="idioma in idiomas" :key="idioma.value">
-              <input type="checkbox" :value="idioma.value" v-model="selectedIdioma" />
+              <input type="checkbox" :value="idioma.value" v-model="selectedIdioma" @change="aplicarFiltros"/>
               <span>{{ idioma.label }}</span>
               <span class="count">({{ countActivitiesByIdioma(idioma.value) }})</span>
             </label>
@@ -67,7 +73,7 @@
           </div>
           <div class="filter-options" v-if="horarioExpanded">
             <label class="filter-option" v-for="horario in horarios" :key="horario.value">
-              <input type="checkbox" :value="horario.value" v-model="selectedHorario" />
+              <input type="checkbox" :value="horario.value" v-model="selectedHorario" @change="aplicarFiltros"/>
               <span>{{ horario.label }}</span>
               <span class="count">({{ countActivitiesByHorario(horario.value) }})</span>
             </label>
@@ -78,10 +84,6 @@
       <!-- Main Content -->
       <main class="main-content">
         <div class="content-header">
-          <button class="filter-toggle" @click="toggleFilters" v-if="isMobile">
-            <filter-icon />
-            Filtros
-          </button>
           <div class="results-count">
             {{ totalActivities }} actividades disponibles
           </div>
@@ -151,13 +153,12 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import MisActividades from '../components/MisActividades.vue';
 import { useCentrosStore } from '@/stores/centros';
-import { useActivityFiltroStore } from '../stores/activityFiltroStore'; // Importa el store
+import { useActivityFiltroStore } from '../stores/activityFiltroStore';
 
 const centrosStore = useCentrosStore();
-const activityStore = useActivityFiltroStore(); // Usa el store
+const activityStore = useActivityFiltroStore();
 
 const filtersOpen = ref(false);
-const isMobile = computed(() => window.innerWidth < 768);
 const showLogin = ref(false);
 const showTMC = ref(false);
 const authStore = useAuthStore();
@@ -170,8 +171,6 @@ const selectedHorario = ref([]);
 const sortBy = ref('date');
 
 const centros = ref([]);
-//const allActivities = ref([]);  <--  Ya no es necesario aquí
-//const userActivities = ref([]);  <--  Ya no es necesario aquí
 
 const idiomas = [
   { value: 'es', label: 'Castellano' },
@@ -200,6 +199,13 @@ const showTMCFromRegister = ref(false);
 
 const toggleFilters = () => {
   filtersOpen.value = !filtersOpen.value;
+   // Si los filtros se están abriendo, colapsa las secciones para una mejor experiencia en móvil
+  if (filtersOpen.value) {
+    centrosExpanded.value = false;
+    edadExpanded.value = false;
+    idiomaExpanded.value = false;
+    horarioExpanded.value = false;
+  }
 };
 
 const showLoginOptions = () => {
@@ -271,8 +277,6 @@ const handleRegister = async (activityId) => {
     const response = await axios.post(`${API_URL}/activityUser/add`, { activity_id: activityId });
     console.log('Registration successful:', response.data);
     showRegistrationSuccess.value = true;
-    // Ya no necesitas fetchUserActivities aquí.
-    // activityStore.fetchActivitiesAll();  <--  Podrías recargar todas, pero no es estrictamente necesario
   } catch (error) {
     console.error('Registration failed:', error);
   }
@@ -281,7 +285,6 @@ const handleRegister = async (activityId) => {
 const handleLoginSuccess = async () => {
   showLogin.value = false;
   showTMC.value = false;
-  // activityStore.fetchActivitiesAll(); <--  Podrías recargar, pero no es estrictamente necesario aquí.
   router.push('/');
 };
 
@@ -295,7 +298,6 @@ const goToPage = (page) => {
 };
 
 const filteredActivities = computed(() => {
-  // Usa activityStore.allActivities
   let activities = activityStore.allActivities;
 
   if (selectedCentro.value.length > 0) {
@@ -332,12 +334,10 @@ const paginatedActivities = computed(() => {
   return filteredActivities.value.slice(start, end);
 });
 
-// Ya no necesitas fetchActivities ni fetchUserActivities aquí.
-
 onMounted(async () => {
   await centrosStore.fetchAllCentros();
   centros.value = centrosStore.allCentros;
-  await activityStore.fetchActivitiesAll(); // Usa el método del store
+  await activityStore.fetchActivitiesAll();
 
   validateTokenOnLoad();
 
@@ -350,15 +350,11 @@ watch(filteredActivities, () => {
   currentPage.value = 1;
 });
 
-// Ya no necesitas el watch de authStore.token
-
 const countActividades = (centroId) => {
-    //Usa el state.allActivities del store.
   return activityStore.allActivities.filter(act => act.centro_id === centroId).length;
 };
 
 const countActivitiesByEdad = (min, max) => {
-    //Usa el state.allActivities del store.
   return activityStore.allActivities
     .filter(activity => {
       return activity.activity.edad_min <= max && activity.activity.edad_max >= min;
@@ -367,17 +363,17 @@ const countActivitiesByEdad = (min, max) => {
 };
 
 const countActivitiesByIdioma = (idioma) => {
-    //Usa el state.allActivities del store.
   return activityStore.allActivities.filter(activity => activity.activity.idioma === idioma).length;
 };
 
 const countActivitiesByHorario = (horario) => {
-    //Usa el state.allActivities del store.
   return activityStore.allActivities.filter(activity => activity.activity.horario === horario).length;
 };
 
 function aplicarFiltros() {
   currentPage.value = 1;
+   // Cierra los filtros después de aplicar en móvil
+  filtersOpen.value = false;
 }
 </script>
 
@@ -385,41 +381,21 @@ function aplicarFiltros() {
 /* Style for the minimal scrollbar */
 .filters-sidebar::-webkit-scrollbar {
   width: 5px;
-  /* Adjust width as needed */
 }
 
 .filters-sidebar::-webkit-scrollbar-track {
   background: #f1f1f1;
-  /* Color of the tracking area */
 }
 
 .filters-sidebar::-webkit-scrollbar-thumb {
   background: #888;
-  /* Color of the scroll thumb */
   border-radius: 2.5px;
-  /* Make the thumb rounded */
 }
 
 .filters-sidebar::-webkit-scrollbar-thumb:hover {
   background: #555;
-  /* Color when hovered */
 }
 
-/* No scrollbar on filters-sidebar */
-.filters-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  padding: 1.5rem;
-  height: calc(100vh - 72px);
-  position: sticky;
-  top: 72px;
-  overflow-y: auto;
-  /* Add this back */
-  border-right: 1px solid #e5e7eb;
-}
-
-
-/* ... (the rest of your existing styles) ... */
 .activities-portal {
   min-height: 100vh;
   background-color: #fff;
@@ -433,7 +409,18 @@ function aplicarFiltros() {
   gap: 2rem;
 }
 
-
+.filters-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 1.5rem;
+  height: calc(100vh - 72px);
+  position: sticky;
+  top: 72px;
+  overflow-y: auto;
+  border-right: 1px solid #e5e7eb;
+  background-color: white;
+  transition: transform 0.3s ease-in-out;
+}
 
 .filters-header {
   display: flex;
@@ -446,10 +433,6 @@ function aplicarFiltros() {
   font-size: 1.25rem;
   font-weight: 700;
   color: #006758;
-}
-
-.close-filters {
-  display: none;
 }
 
 .filters-section {
@@ -470,7 +453,6 @@ function aplicarFiltros() {
   flex-direction: column;
   gap: 0.5rem;
   overflow: hidden;
-  /* Hide content when collapsed */
   transition: max-height 0.3s ease;
 }
 
@@ -491,7 +473,6 @@ function aplicarFiltros() {
 .main-content {
   flex: 1;
   padding: 1.5rem;
-
 }
 
 .content-header {
@@ -502,6 +483,10 @@ function aplicarFiltros() {
 }
 
 .filter-toggle {
+  display: none;
+}
+
+.close-filters {
   display: none;
 }
 
@@ -525,28 +510,21 @@ function aplicarFiltros() {
   gap: 2rem;
 }
 
-@media (max-width: 1200px) {
-  .activities-grid {
-      grid-template-columns: repeat(2, 1fr);
-  }
+.filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem 0;
 }
 
-@media (max-width: 767px) {
-  .filters-sidebar {
-      position: fixed;
-      left: -100%;
-      top: 0;
-      bottom: 0;
-      width: 100%;
-      max-width: 320px;
-      background: white;
-      z-index: 50;
-      transition: left 0.3s ease;
-  }
+.collapse-icon {
+  font-size: 1rem;
+  color: #6b7280;
+}
 
-  .show-filters {
-      left: 0;
-  }
+.collapsed .filter-options {
+  max-height: 0;
 }
 
 .pagination {
@@ -575,25 +553,6 @@ function aplicarFiltros() {
   border-color: #006758;
 }
 
-/* Styles for collapsible sections */
-.filter-section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding: 0.5rem 0;
-}
-
-.collapse-icon {
-  font-size: 1rem;
-  color: #6b7280;
-}
-
-.collapsed .filter-options {
-  max-height: 0;
-  transition: max-height 0.3s ease;
-}
-
 /* Popup Styles */
 .popup-overlay {
   position: fixed;
@@ -606,7 +565,6 @@ function aplicarFiltros() {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  /* Ensure it's above other content */
 }
 
 .popup-content {
@@ -636,5 +594,73 @@ function aplicarFiltros() {
 
 .popup-content button:hover {
   background-color: #004c3f;
+}
+
+@media (max-width: 1200px) {
+  .activities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .filters-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 100%;
+    z-index: 1000;
+    transform: translateX(-100%);
+     /* Asegura que los filtros estén colapsados inicialmente en móvil */
+    overflow-y: auto; /* Asegura que el contenido de los filtros sea scrollable */
+  }
+
+  .filters-sidebar.show-filters {
+    transform: translateX(0);
+  }
+
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    background-color: #006758;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .close-filters {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .activities-grid {
+    grid-template-columns: 1fr;
+  }
+    /* Estilos para colapsar las secciones por defecto en móvil */
+  .filters-section.collapsed .filter-options {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;  /* Añadido para eliminar el padding cuando está colapsado */
+  }
+
+  .filter-section-header {
+    padding: 0.5rem 0; /* Ajusta el padding si es necesario */
+  }
+
 }
 </style>
