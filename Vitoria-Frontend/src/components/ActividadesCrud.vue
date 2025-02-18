@@ -1,6 +1,6 @@
 <template>
-  <BaseCrud ref="baseCrudRef"  :items="adminStore.actividades" :perPage="5" @add="addActivity" @page-changed="handlePageChange">
-    <div class="table-responsive">
+  <BaseCrud ref="baseCrudRef" :items="adminStore.actividades" :perPage="5" @add="addActivity" @page-changed="handlePageChange">
+    <div class="table-responsive" v-if="baseCrudRef">
       <table class="table">
         <thead>
           <tr>
@@ -38,6 +38,7 @@
         Error: {{ adminStore.error.message }}
       </div>
     </div>
+    <div v-else>Cargando datos...</div>
 
     <!-- Modal para Añadir Actividad -->
     <div v-if="showAddModal" class="modal-overlay">
@@ -111,9 +112,9 @@
 import BaseCrud from './BaseCrud.vue';
 import { ref, onMounted, reactive } from 'vue';
 import { useAdminStore } from '@/stores/adminStore'; // Importa el store
-import axios from 'axios';
 
 const adminStore = useAdminStore(); // Usa el store
+
 //Estados para mostrar modales
 const showAddModal = ref(false);
 const showEditModal = ref(false);
@@ -137,8 +138,8 @@ const editActivityData = ref({
     plazas: null
 });
 
-// Referencia a la instancia de BaseCrud
-const baseCrudRef = ref(null);
+// Referencia a la instancia de BaseCrud  --MUY IMPORTANTE--
+const baseCrudRef = ref(null); // Inicializa como null
 
 onMounted(async () => {
   await adminStore.fetchActividades();
@@ -220,8 +221,6 @@ const deleteActivity = (activity) => {
   }
 };
 const handlePageChange = (newPage) => {
-    // Puedes hacer algo aquí si necesitas recargar datos al cambiar de página
-    // Por ejemplo:  adminStore.fetchUsuarios(newPage);  (si tu API soporta paginación en el backend)
     console.log('Página cambiada a:', newPage);
 };
 </script>

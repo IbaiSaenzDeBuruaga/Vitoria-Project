@@ -1,15 +1,15 @@
 services:
   laravel:
     build:
-      context: ./Hefesto-Backend
+      context: ./Vitoria-Backend
       dockerfile: Dockerfile
-    container_name: laravel-app
+    container_name: vitoria-laravel-app
     ports:
       - "8000:80"
     networks:
       - app-network
     environment:
-      - APP_NAME=Hefesto
+      - APP_NAME=Vitoria-Activity
       - APP_ENV=local
       - APP_KEY=base64:xIDGkjA9OBCNHeIsTb4kGfqwqpB3t8z4ywQlPtW1L90=
       - JWT_SECRET=YyQJwvGf3CWj8WPMXMgbp0ZZoBo2EBg7b6I2XG05TLpGwQu1smpQ7d4GIwdQ6x7t
@@ -27,7 +27,7 @@ services:
       - LOG_DEPRECATIONS_CHANNEL=null
       - LOG_LEVEL=debug
       - DB_CONNECTION=mysql
-      - DB_HOST=150.241.37.58
+      - DB_HOST=172.20.227.241
       - DB_PORT=3306
       - DB_DATABASE=grupo6_2425
       - DB_USERNAME=grupo6_2425
@@ -54,20 +54,20 @@ services:
       - MAIL_USERNAME=null
       - MAIL_PASSWORD=null
       - MAIL_FROM_ADDRESS="hello@example.com"
-      - MAIL_FROM_NAME=Hefesto
+      - MAIL_FROM_NAME=Vitoria-Activity
       - AWS_ACCESS_KEY_ID=
       - AWS_SECRET_ACCESS_KEY=
       - AWS_DEFAULT_REGION=us-east-1
       - AWS_BUCKET=
       - AWS_USE_PATH_STYLE_ENDPOINT=false
-      - VITE_APP_NAME=Hefesto
+      - VITE_APP_NAME=Vitoria-Activity
  
 
   frontend:
     build:
-      context: ./Hefesto-Frontend
+      context: ./Vitoria-Frontend
       dockerfile: Dockerfile
-    container_name: vue-app
+    container_name: vitoria-vue-app
     ports:
       - "80:80"
     networks:
