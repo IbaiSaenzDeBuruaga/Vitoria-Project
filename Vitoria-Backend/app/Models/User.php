@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class User extends Authenticatable implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
@@ -84,4 +86,21 @@ class User extends Authenticatable implements JWTSubject, AuthenticatableContrac
         return $this->hasMany(ActivityUser::class);
     }
 
+    public static function seedUsers()
+    {
+        // Crear usuario administrador
+        User::create([
+            'name' => 'Admin',
+            'primer_apellido' => 'AdminAp1',
+            'segundo_apellido' => 'AdminAp2',
+            'email' => 'i@i.com',
+            'password' => Hash::make('adminibai'),
+            'n_tarjeta' => '1234567890123456',
+            'n_barcos' => 0,
+            'rol' => 'admin', // o el rol que corresponda a administrador
+        ]);
+
+       
+        
+    }
 }

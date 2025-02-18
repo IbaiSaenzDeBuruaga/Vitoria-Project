@@ -2,7 +2,7 @@
 <template>
   <div class="activity-card">
     <div class="activity-image">
-      <img :src="imagen || '/placeholder.svg'" :alt="nombre" />
+      <img :src="imageUrl" :alt="nombre" />
     </div>
     <div class="activity-info">
       <h3>{{ nombre }}</h3>
@@ -20,6 +20,7 @@
 <script setup>
 import { ChevronRightIcon, CalendarIcon, ClockIcon, CalendarDaysIcon } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/authStore';
+import { computed } from 'vue';
 
 const props = defineProps({
   nombre: String,
@@ -40,6 +41,13 @@ const handleRegister = () => {
     emit('show-login');
   }
 };
+
+const VITE_IMAGE_URL = import.meta.env.VITE_IMAGE_URL;
+
+const imageUrl = computed(() => {
+  return props.imagen ? `${VITE_IMAGE_URL}${props.imagen}` : '/placeholder.svg';
+});
+
 </script>
 
 
