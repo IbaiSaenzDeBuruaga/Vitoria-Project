@@ -161,6 +161,7 @@ const submitAddUsuario = async () => {
             n_tarjeta: '',
             n_barcos: ''
         };
+        location.reload();
 
     } catch (error) {
         console.error("Error al añadir usuario:", error);
@@ -200,6 +201,7 @@ const submitEditUsuario = async () => {
             n_tarjeta: '',
             n_barcos: ''
         };
+        location.reload();
     } catch (error) {
         console.error("Error al editar usuario:", error);
     }
@@ -220,7 +222,7 @@ const closeEditModal = () => {
 };
 const deleteUsuario = (usuario) => {
  if (confirm(`¿Estás seguro de que quieres eliminar al usuario "${usuario.name}"?`)) {
-    adminStore.deleteUsuario(usuario.id)
+    adminStore.deleteUsuario(usuario.id)        
     .catch(error => {
           // Maneja el error aquí si es necesario
     });
