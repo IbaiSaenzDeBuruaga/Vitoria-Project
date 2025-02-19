@@ -43,7 +43,7 @@
           <user-circle-2-icon/>
           Desconectar
         </button>
-        <button class="login-admin" @click="emit('goAdmin')">
+        <button v-if=" authStore.getRol == 'admin'" class="login-admin" @click="emit('goAdmin')">
           Administración
         </button>
       </div>
@@ -63,6 +63,8 @@ const emit = defineEmits(['show-login', 'go-home', 'logout', 'show-my-activities
 
 
 const authStore = useAuthStore();
+const rol = ref('');
+
 
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
@@ -75,9 +77,16 @@ const checkIsMobile = () => {
   isMobile.value = window.innerWidth < 1024; // Consistent with your media query
 };
 
-onMounted(() => {
+onMounted(async () => {
   checkIsMobile();
-  window.addEventListener('resize', checkIsMobile);
+  window.addEventListener('resize', checkIsMobile); 
+
+  await authStore.verifyRol();
+
+  console.log("El valor del rol es "+authStore.getRol);
+
+
+  
 });
 
 onUnmounted(() => {

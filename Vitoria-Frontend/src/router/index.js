@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import axios from 'axios';
 import HomeView from '../views/HomeView.vue';
 import AdminView from '@/views/AdminView.vue';
+import { useAuthStore } from '@/stores/authStore';
 
 const urlBack = import.meta.env.VITE_API_AUTH_URL;
 
@@ -32,6 +33,8 @@ const comprobarToken = async () => {
         },
       });
       console.log('Token válido:', response.data); // Inspecciona la respuesta completa
+      const authStore = useAuthStore();
+      await authStore.verifyRol();
       return {
         isValid: true,
         rol: response.data.data.rol,
@@ -58,7 +61,9 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.serAdmin)) {
     console.log('Ruta protegida detectada más el token'+ token); // Depuración: Indica que la ruta está protegida
     if (token) {
+
       console.log('El token ha sido detectado ');
+
       try {
         const { isValid, rol } = await comprobarToken();
         // Si la validación es exitosa, permite el acceso
