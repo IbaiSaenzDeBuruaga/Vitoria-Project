@@ -290,7 +290,7 @@ const handleRegister = async (activityId) => {
 const handleLoginSuccess = async () => {
   showLogin.value = false;
   showTMC.value = false;
-  router.push('/');
+  location.reload();
 };
 
 const currentPage = ref(1);
@@ -383,7 +383,7 @@ function aplicarFiltros() {
 </script>
 
 <style scoped>
-/* Style for the minimal scrollbar */
+/* Style for the minimal sc lbar */
 .filters-sidebar::-webkit-scrollbar {
   width: 5px;
 }
