@@ -20,6 +20,17 @@ COPY . /var/www/html
 # Instala las dependencias de Laravel usando Composer
 RUN composer install 
 
+
+# Ejecuta el comando para crear el enlace simbólico
+RUN echo "Creando enlace simbólico:"
+RUN php artisan storage:link
+
+
+# Intenta crear el directorio storage/app/public si no existe (aunque ya debería existir al copiar el proyecto)
+RUN echo "Creando el directorio storage/app/public (si no existe):"
+RUN mkdir -p storage/app/public
+
+
 # Establece la propiedad de la carpeta bootstrap/cache al usuario www-data
 RUN chown -R www-data:www-data bootstrap/cache
 
@@ -41,13 +52,6 @@ RUN ls -l storage/app/public
 RUN echo "Verificando permisos del directorio public:"
 RUN ls -l public
 
-# Intenta crear el directorio storage/app/public si no existe (aunque ya debería existir al copiar el proyecto)
-RUN echo "Creando el directorio storage/app/public (si no existe):"
-RUN mkdir -p storage/app/public
-
-# Ejecuta el comando para crear el enlace simbólico
-RUN echo "Creando enlace simbólico:"
-RUN php artisan storage:link
 
 # Expone el puerto 80
 EXPOSE 80
