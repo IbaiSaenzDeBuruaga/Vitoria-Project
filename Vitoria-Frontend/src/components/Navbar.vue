@@ -116,8 +116,8 @@ onUnmounted(() => {
 }
 
 .logo {
-  height: 32px; /*  Fixed height.  Using % for height can be problematic. */
-  width: 32px;  /*  Fixed width */
+  height: 10%; /*  Fixed height.  Using % for height can be problematic. */
+  width: 10%;  /*  Fixed width */
 }
 
 .logo-text {
