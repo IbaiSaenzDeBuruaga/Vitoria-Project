@@ -147,8 +147,8 @@ const logout = async () => {
 }
 
 .logo {
-  height: 32px;
-  width: 32px;
+  height: 10%;
+  width: 10%;
 }
 
 .logo-text {
